@@ -47,6 +47,4 @@ public interface ArticleInfoMapper {
      */
     int updateByPrimaryKey(ArticleInfo record);
 
-    @Select("select now();")
-    LocalDateTime test();
 }
