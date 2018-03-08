@@ -14,7 +14,3 @@ spring:
 mybatis:
   mapper-locations: classpath:basemapper/*.xml,classpath:extramapper/*.xml
   type-handlers-package: com.smzdm.typehandler
-spider:
-  home-url: http://www.smzdm.com/homepage/json_more
-  discovery-url: http://faxian.smzdm.com/json_more?page=2,http://faxian.smzdm.com/json_more?page=1
-  hot-url: http://faxian.smzdm.com/json_more?filter=h3s0t0f0c0&page=5,http://faxian.smzdm.com/json_more?filter=h3s0t0f0c0&page=4,http://faxian.smzdm.com/json_more?filter=h3s0t0f0c0&page=3,http://faxian.smzdm.com/json_more?filter=h3s0t0f0c0&page=2,http://faxian.smzdm.com/json_more?filter=h3s0t0f0c0&page=1
