@@ -1,16 +1,12 @@
 package com.smzdm.scheduling;
 
-import com.smzdm.config.entity.SpiderConfigEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 
 @Component
 public class SpiderJobs {
 
-    @Resource
-    private SpiderConfigEntity config;
 
 
     @Scheduled(fixedDelay = 120 * 1000)
