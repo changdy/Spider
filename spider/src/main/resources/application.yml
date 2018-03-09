@@ -14,3 +14,8 @@ spring:
 mybatis:
   mapper-locations: classpath:basemapper/*.xml,classpath:extramapper/*.xml
   type-handlers-package: com.smzdm.typehandler
+logging:
+  level:
+    root: info
+    com.ibatis: TRACE
+    com.smzdm: debug
