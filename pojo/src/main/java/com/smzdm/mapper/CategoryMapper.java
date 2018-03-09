@@ -1,4 +1,4 @@
-package com.smzdm.basemapper;
+package com.smzdm.mapper;
 
 
 import com.smzdm.pojo.Category;

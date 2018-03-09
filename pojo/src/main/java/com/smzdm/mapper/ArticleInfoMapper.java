@@ -1,9 +1,7 @@
-package com.smzdm.basemapper;
+package com.smzdm.mapper;
 
 import com.smzdm.pojo.ArticleInfo;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ArticleInfoMapper {

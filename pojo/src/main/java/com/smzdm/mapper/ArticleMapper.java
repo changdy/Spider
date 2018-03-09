@@ -1,7 +1,6 @@
-package com.smzdm.basemapper;
+package com.smzdm.mapper;
 
 import com.smzdm.pojo.Article;
-import org.apache.ibatis.annotations.Delete;
 
 import java.util.List;
 
