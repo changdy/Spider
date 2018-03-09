@@ -3,9 +3,11 @@ package com.smzdm.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smzdm.Enum.SpiderConfigEnum;
+import com.smzdm.Enum.TypeRelationEnum;
 import com.smzdm.basemapper.ArticleInfoMapper;
 import com.smzdm.basemapper.ArticleJsonMapper;
 import com.smzdm.basemapper.ArticleMapper;
+import com.smzdm.basemapper.EnumMapper;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
@@ -17,14 +19,12 @@ import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @Service
 public class SpiderJobService {
@@ -39,6 +39,8 @@ public class SpiderJobService {
     private ArticleInfoMapper articleInfoMapper;
     @Resource
     private ArticleJsonMapper articleJsonMapper;
+    @Resource
+    private EnumMapper enumMapper;
     @Resource(name = "longValueTemplate")
     private RedisTemplate<String, Long> longValueTemplate;
     @Resource
@@ -78,14 +80,14 @@ public class SpiderJobService {
 
     private Long generateArticle(Stream<JSONObject> stream, boolean discovery, Long timeSort) {
         Stream<Article> articleStream = stream.filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).filter(Objects::nonNull);
-        List<Integer> ids = articleStream.map(Article::getArticleId).collect(toList());
-        articleMapper.deleteByIDList(ids);
         List<Article> articles = articleStream.collect(toList());
         articles.forEach(x -> x.setIsDiscovery(discovery));
-        updateRedisType(articleStream, "article:mall", Article::getMall);
-        updateRedisType(articleStream, "article:channel", Article::getChannel);
-        updateRedisType(articleStream, "article:type", Article::getType);
-        updateRedisType(articleStream, "article:yh_type", Article::getYhType);
+        for (TypeRelationEnum value : TypeRelationEnum.values()) {
+            updateRedisType(articleStream, value.getKey(), value.getFunction());
+        }
+        List<Integer> ids = articleStream.map(Article::getArticleId).collect(toList());
+        articleMapper.deleteByIDList(ids);
+        articleMapper.insertList(articles);
         return articleStream.map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);
     }
 
@@ -98,6 +100,7 @@ public class SpiderJobService {
             articleJson.setIsDiscovery(discovery);
             return articleJson;
         }).collect(toList());
+        articleJsonMapper.insertList(jsonList);
     }
 
     private void updateRedisType(Stream<Article> articleStream, String key, Function<Article, String> function) {
@@ -105,7 +108,8 @@ public class SpiderJobService {
         List<String> streamMembers = articleStream.map(function).distinct().collect(toList());
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
-            stringRedisTemplate.opsForSet().add("key", (String[]) streamMembers.toArray());
+            stringRedisTemplate.opsForSet().add(key, (String[]) streamMembers.toArray());
+            streamMembers.forEach(x -> enumMapper.addEnum(key, "'" + x + "'"));
         }
     }
 }
