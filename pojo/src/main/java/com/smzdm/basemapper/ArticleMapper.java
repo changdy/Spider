@@ -48,4 +48,6 @@ public interface ArticleMapper {
     int updateByPrimaryKey(Article record);
 
     void deleteByIDList(List<Integer> ids);
+
+    void insertList(List<Article> articles);
 }

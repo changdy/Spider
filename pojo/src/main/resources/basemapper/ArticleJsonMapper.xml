@@ -63,4 +63,10 @@
     select id, content, is_discovery, create_date
     from article_json
   </select>
+  <insert id="insertList" parameterType="java.util.List">
+    insert into article_json (content, is_discovery,create_date) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.content,jdbcType=VARCHAR}, #{item.isDiscovery,jdbcType=BIT},  #{item.createDate,jdbcType=DATE})
+    </foreach>
+  </insert>
 </mapper>

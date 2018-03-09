@@ -45,4 +45,6 @@ public interface ArticleJsonMapper {
      * @mbg.generated Fri Jan 26 22:57:38 CST 2018
      */
     int updateByPrimaryKey(ArticleJson record);
+
+    void insertList(List<ArticleJson> list);
 }
