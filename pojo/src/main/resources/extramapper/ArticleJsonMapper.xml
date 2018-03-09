@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.smzdm.mapper.ArticleJsonMapper">
-  <insert id="insertList" parameterType="java.util.List">
-    insert into article_json (content, is_discovery,create_date) values
-    <foreach collection="list" item="item" separator=",">
-      (#{item.content,jdbcType=VARCHAR}, #{item.isDiscovery,jdbcType=BIT},  #{item.createDate,jdbcType=DATE})
-    </foreach>
-  </insert>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into article_json (content, is_discovery,create_date) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.content,jdbcType=VARCHAR}, #{item.isDiscovery,jdbcType=BIT}, #{item.createDate,jdbcType=DATE})
+        </foreach>
+    </insert>
 </mapper>

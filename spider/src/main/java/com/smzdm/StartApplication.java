@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @ComponentScan("com.smzdm")
-@MapperScan("com.smzdm.basemapper")
+@MapperScan("com.smzdm.mapper")
 @EnableTransactionManagement
 @SpringBootApplication
 @EnableScheduling

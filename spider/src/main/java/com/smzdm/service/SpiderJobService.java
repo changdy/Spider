@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smzdm.Enum.SpiderConfigEnum;
 import com.smzdm.Enum.TypeRelationEnum;
-import com.smzdm.basemapper.ArticleInfoMapper;
-import com.smzdm.basemapper.ArticleJsonMapper;
-import com.smzdm.basemapper.ArticleMapper;
-import com.smzdm.basemapper.EnumMapper;
+import com.smzdm.mapper.ArticleInfoMapper;
+import com.smzdm.mapper.ArticleJsonMapper;
+import com.smzdm.mapper.ArticleMapper;
+import com.smzdm.mapper.EnumMapper;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
@@ -55,57 +55,57 @@ public class SpiderJobService {
             acc.addAll(element);
             return acc;
         });
-        Stream<JSONObject> stream = array.stream().map(x -> (JSONObject) x).filter(x -> x.containsKey("article_id"));
-        generateArticleInfo(stream);
+        List<JSONObject> jsonList = array.stream().map(x -> (JSONObject) x).filter(x -> x.containsKey("article_id")).collect(toList());
+        generateArticleInfo(jsonList);
         if (spiderConfig.getRedisKey() != null) {
-            insertArticle(spiderConfig, stream);
+            insertArticle(spiderConfig, jsonList);
         }
     }
 
-    //todo 各种插入数据库
-    private void generateArticleInfo(Stream<JSONObject> stream) {
+    private void generateArticleInfo(List<JSONObject> jsonList) {
         LocalDateTime now = LocalDateTime.now();
-        List<ArticleInfo> infoList = stream.map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
+        List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
         infoList.forEach(x -> x.setUpdateTime(now));
+        List<Long> ids = infoList.stream().map(ArticleInfo::getArticleId).collect(toList());
     }
 
-    private void insertArticle(SpiderConfigEnum spiderConfig, Stream<JSONObject> stream) {
+    private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {
         String key = spiderConfig.getRedisKey();
         boolean discovery = spiderConfig.isDiscovery();
         long timeSort = Optional.ofNullable(longValueTemplate.opsForValue().get(key)).orElse(0L);
-        timeSort = generateArticle(stream, discovery, timeSort);
-        generateArticleJson(stream, discovery, timeSort);
-        longValueTemplate.opsForValue().set(key, timeSort);
+        generateArticleJson(jsonList, discovery, timeSort);
+        longValueTemplate.opsForValue().set(key, generateArticle(jsonList, discovery, timeSort));
     }
 
-    private Long generateArticle(Stream<JSONObject> stream, boolean discovery, Long timeSort) {
-        Stream<Article> articleStream = stream.filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).filter(Objects::nonNull);
-        List<Article> articles = articleStream.collect(toList());
+    private Long generateArticle(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
+        List<Article> articles = jsonList.stream().filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).collect(toList());
+        List<Integer> ids = articles.stream().map(Article::getArticleId).collect(toList());
+        articleMapper.deleteByIDList(ids);
         articles.forEach(x -> x.setIsDiscovery(discovery));
         for (TypeRelationEnum value : TypeRelationEnum.values()) {
-            updateRedisType(articleStream, value.getKey(), value.getFunction());
+            updateRedisType(articles, value.getKey(), value.getFunction());
         }
-        List<Integer> ids = articleStream.map(Article::getArticleId).collect(toList());
-        articleMapper.deleteByIDList(ids);
         articleMapper.insertList(articles);
-        return articleStream.map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);
+        return articles.stream().map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);
     }
 
-    private void generateArticleJson(Stream<JSONObject> stream, boolean discovery, Long timeSort) {
+    private void generateArticleJson(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
         LocalDateTime now = LocalDateTime.now();
-        List<ArticleJson> jsonList = stream.filter(x -> x.getLong("timesort") > timeSort).map(x -> {
+        List<ArticleJson> list = jsonList.stream().filter(x -> x.getLong("timesort") > timeSort).map(x -> {
             ArticleJson articleJson = new ArticleJson();
             articleJson.setContent(x.toJSONString());
             articleJson.setCreateDate(now);
             articleJson.setIsDiscovery(discovery);
             return articleJson;
         }).collect(toList());
-        articleJsonMapper.insertList(jsonList);
+        if (list.size() > 0) {
+            articleJsonMapper.insertList(list);
+        }
     }
 
-    private void updateRedisType(Stream<Article> articleStream, String key, Function<Article, String> function) {
+    private void updateRedisType(List<Article> articles, String key, Function<Article, String> function) {
         Set<String> redisMembers = stringRedisTemplate.opsForSet().members(key);
-        List<String> streamMembers = articleStream.map(function).distinct().collect(toList());
+        List<String> streamMembers = articles.stream().map(function).distinct().collect(toList());
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
             stringRedisTemplate.opsForSet().add(key, (String[]) streamMembers.toArray());
