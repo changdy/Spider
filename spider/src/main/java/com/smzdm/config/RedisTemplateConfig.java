@@ -1,12 +1,12 @@
 package com.smzdm.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**
@@ -22,9 +22,10 @@ public class RedisTemplateConfig {
     @Resource
     private RedisTemplate<String, Long> redisTemplate;
 
-    @PostConstruct
-    public void init() {
+    @Bean("longValueTemplate")
+    public RedisTemplate<String, Long> longValueTemplate() {
         redisTemplate.setKeySerializer(stringSerializer);
         redisTemplate.setValueSerializer(objectSerializer);
+        return redisTemplate;
     }
 }

@@ -39,7 +39,7 @@ public class SpiderJobService {
     private ArticleInfoMapper articleInfoMapper;
     @Resource
     private ArticleJsonMapper articleJsonMapper;
-    @Resource
+    @Resource(name = "longValueTemplate")
     private RedisTemplate<String, Long> longValueTemplate;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
