@@ -46,6 +46,14 @@ public enum HandlerFunction {
             ints[i] = array.getJSONObject(i).getInteger("ID");
         }
         return ints;
+    }),
+    PARENTS(x -> {
+        String[] split = x.split(",");
+        Short[] ids = new Short[split.length];
+        for (int i = 0; i < split.length; i++) {
+            ids[i] = Short.valueOf(split[i]);
+        }
+        return ids;
     });
 
     private Function<String, Object> function;
