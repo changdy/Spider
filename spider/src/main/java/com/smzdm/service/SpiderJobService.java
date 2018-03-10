@@ -46,6 +46,8 @@ public class SpiderJobService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private static final String CATEGORY_IDS = "category_ids";
+
     public void getInfo(SpiderConfigEnum spiderConfig) {
         Spider spider = Spider.create(infoSpiderConfig);
         List<String> strings = Arrays.asList(spiderConfig.getUrl());
@@ -64,7 +66,7 @@ public class SpiderJobService {
 
     private void generateArticleInfo(List<JSONObject> jsonList) {
         LocalDateTime now = LocalDateTime.now();
-        List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
+        List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).filter(x -> x.getWorthy() != null).collect(toList());
         infoList.forEach(x -> x.setUpdateTime(now));
         articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
         articleInfoMapper.insertHistoryList(infoList);
@@ -88,11 +90,10 @@ public class SpiderJobService {
             updateRedisType(articles, value.getKey(), value.getFunction());
         }
         if (discovery) {
-            Set<Long> redisCategories = longValueTemplate.opsForSet().members("category_layer");
+            Set<Long> redisCategories = longValueTemplate.opsForSet().members(CATEGORY_IDS);
             Set<Category> newCategories = jsonList.stream().flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().longValue())).collect(toSet());
             if (newCategories.size() > 0) {
-                Set<Long> collect = newCategories.stream().map(x -> x.getId().longValue()).collect(toSet());
-                longValueTemplate.opsForSet().add("category_layer", (Long[]) collect.toArray());
+                longValueTemplate.opsForSet().add(CATEGORY_IDS, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
                 categoryMapper.insertList(newCategories);
             }
         }
@@ -116,11 +117,11 @@ public class SpiderJobService {
 
     private void updateRedisType(List<Article> articles, String key, Function<Article, String> function) {
         Set<String> redisMembers = stringRedisTemplate.opsForSet().members(key);
-        List<String> streamMembers = articles.stream().map(function).distinct().collect(toList());
+        List<String> streamMembers = articles.stream().map(function).filter(Objects::nonNull).distinct().collect(toList());
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
-            stringRedisTemplate.opsForSet().add(key, (String[]) streamMembers.toArray());
-            streamMembers.forEach(x -> enumMapper.addEnum(key, "'" + x + "'"));
+            stringRedisTemplate.opsForSet().add(key, streamMembers.toArray(new String[streamMembers.size()]));
+            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x + "'"));
         }
     }
 }
