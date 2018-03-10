@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smzdm.mapper.ArticleInfoMapper">
+  <insert id="insertList" parameterType="java.util.List">
+    insert into article_info (article_id, comment,collection, worthy, unworthy,sold_out, timeout, update_time) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.articleId,jdbcType=BIGINT}, #{item.comment,jdbcType=SMALLINT}, #{item.collection,jdbcType=SMALLINT}, #{item.worthy,jdbcType=SMALLINT}, #{item.unworthy,jdbcType=SMALLINT}, #{item.soldOut,jdbcType=BIT}, #{item.timeout,jdbcType=BIT}, #{item.updateTime,jdbcType=DATE})
+    </foreach>
+  </insert>
+  <insert id="insertHistoryList" parameterType="java.util.List">
+    insert into article_history_info (article_id, comment,collection, worthy, unworthy,sold_out, timeout, update_time) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.articleId,jdbcType=BIGINT}, #{item.comment,jdbcType=SMALLINT}, #{item.collection,jdbcType=SMALLINT}, #{item.worthy,jdbcType=SMALLINT}, #{item.unworthy,jdbcType=SMALLINT}, #{item.soldOut,jdbcType=BIT}, #{item.timeout,jdbcType=BIT}, #{item.updateTime,jdbcType=DATE})
+    </foreach>
+  </insert>
+  <delete id="deleteByIDArticleIDs">
+    DELETE FROM article_info WHERE article_id IN
+    <foreach item="id" collection="list" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+</mapper>

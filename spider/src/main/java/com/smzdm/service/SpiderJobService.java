@@ -22,7 +22,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -66,7 +65,9 @@ public class SpiderJobService {
         LocalDateTime now = LocalDateTime.now();
         List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
         infoList.forEach(x -> x.setUpdateTime(now));
-        List<Long> ids = infoList.stream().map(ArticleInfo::getArticleId).collect(toList());
+        articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
+        articleInfoMapper.insertHistoryList(infoList);
+        articleInfoMapper.insertList(infoList);
     }
 
     private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {

@@ -45,4 +45,10 @@ public interface ArticleInfoMapper {
      */
     int updateByPrimaryKey(ArticleInfo record);
 
+    void insertList(List<ArticleInfo> list);
+
+    void insertHistoryList(List<ArticleInfo> list);
+
+    void deleteByIDArticleIDs(List<Integer> ids);
+
 }

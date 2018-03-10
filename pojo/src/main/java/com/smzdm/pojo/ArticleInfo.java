@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ArticleInfo {
     private Integer id;
     @Handler("article_id")
-    private Long articleId;
+    private Integer articleId;
     @Handler("article_comment")
     private Short comment;
     @Handler("article_collection")
