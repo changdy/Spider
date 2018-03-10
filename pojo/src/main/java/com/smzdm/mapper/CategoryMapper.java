@@ -3,6 +3,7 @@ package com.smzdm.mapper;
 
 import com.smzdm.pojo.Category;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CategoryMapper {
@@ -45,4 +46,6 @@ public interface CategoryMapper {
      * @mbg.generated Fri Jan 26 22:57:59 CST 2018
      */
     int updateByPrimaryKey(Category record);
+
+    void insertList(Collection<Category> categories);
 }

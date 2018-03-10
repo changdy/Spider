@@ -49,9 +49,9 @@ public enum HandlerFunction {
     }),
     PARENTS(x -> {
         String[] split = x.split(",");
-        Short[] ids = new Short[split.length];
+        Integer[] ids = new Integer[split.length];
         for (int i = 0; i < split.length; i++) {
-            ids[i] = Short.valueOf(split[i]);
+            ids[i] = Integer.valueOf(split[i]);
         }
         return ids;
     });
