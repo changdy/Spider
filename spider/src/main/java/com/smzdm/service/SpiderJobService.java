@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smzdm.Enum.SpiderConfigEnum;
 import com.smzdm.Enum.TypeRelationEnum;
-import com.smzdm.mapper.ArticleInfoMapper;
-import com.smzdm.mapper.ArticleJsonMapper;
-import com.smzdm.mapper.ArticleMapper;
-import com.smzdm.mapper.EnumMapper;
+import com.smzdm.mapper.*;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
+import com.smzdm.pojo.Category;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class SpiderJobService {
@@ -38,6 +37,8 @@ public class SpiderJobService {
     private ArticleInfoMapper articleInfoMapper;
     @Resource
     private ArticleJsonMapper articleJsonMapper;
+    @Resource
+    private CategoryMapper categoryMapper;
     @Resource
     private EnumMapper enumMapper;
     @Resource(name = "longValueTemplate")
@@ -85,6 +86,15 @@ public class SpiderJobService {
         articles.forEach(x -> x.setIsDiscovery(discovery));
         for (TypeRelationEnum value : TypeRelationEnum.values()) {
             updateRedisType(articles, value.getKey(), value.getFunction());
+        }
+        if (discovery) {
+            Set<Long> redisCategories = longValueTemplate.opsForSet().members("category_layer");
+            Set<Category> newCategories = jsonList.stream().flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().longValue())).collect(toSet());
+            if (newCategories.size() > 0) {
+                Set<Long> collect = newCategories.stream().map(x -> x.getId().longValue()).collect(toSet());
+                longValueTemplate.opsForSet().add("category_layer", (Long[]) collect.toArray());
+                categoryMapper.insertList(newCategories);
+            }
         }
         articleMapper.insertList(articles);
         return articles.stream().map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);

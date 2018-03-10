@@ -5,6 +5,7 @@ import com.smzdm.Handler;
 import com.smzdm.HandlerFunction;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
+import com.smzdm.pojo.Category;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -88,5 +89,9 @@ public class JsonConvertService {
 
     public ArticleInfo convertToInfo(JSONObject json) {
         return handlerConvertException(json, ArticleInfo.class);
+    }
+
+    public Category convertToCategory(JSONObject json) {
+        return handlerConvertException(json, Category.class);
     }
 }
