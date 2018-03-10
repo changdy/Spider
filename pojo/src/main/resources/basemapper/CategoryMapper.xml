@@ -9,7 +9,7 @@
     -->
     <id column="id" jdbcType="SMALLINT" property="id" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="parent_ids" jdbcType="ARRAY" property="parentIds" typeHandler="com.smzdm.typehandler.IntArrayHandler"/>
+    <result column="parent_ids" jdbcType="ARRAY" property="parentIds" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
     <result column="nick_title" jdbcType="VARCHAR" property="nickTitle" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Short">
@@ -29,7 +29,7 @@
     -->
     insert into category (id, title, parent_ids, 
       nick_title)
-    values (#{id,jdbcType=SMALLINT}, #{title,jdbcType=VARCHAR}, #{parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.IntArrayHandler},
+    values (#{id,jdbcType=SMALLINT}, #{title,jdbcType=VARCHAR}, #{parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
       #{nickTitle,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.smzdm.pojo.Category">
@@ -40,7 +40,7 @@
     -->
     update category
     set title = #{title,jdbcType=VARCHAR},
-      parent_ids = #{parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.IntArrayHandler},
+      parent_ids = #{parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
       nick_title = #{nickTitle,jdbcType=VARCHAR}
     where id = #{id,jdbcType=SMALLINT}
   </update>

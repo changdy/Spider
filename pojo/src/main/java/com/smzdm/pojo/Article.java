@@ -28,7 +28,7 @@ public class Article {
     @Handler("article_url")
     private String url;
     @Handler(value = "category_layer", function = HandlerFunction.CATEGORY)
-    private Integer[] category;
+    private Short[] category;
     @Handler("gtm.brand")
     private String brand;
     @Handler(value = "gtm.rmb_price", function = HandlerFunction.PRICE)

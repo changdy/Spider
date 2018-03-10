@@ -16,7 +16,7 @@
     <result column="yh_type" jdbcType="VARCHAR" property="yhType" />
     <result column="pic" jdbcType="VARCHAR" property="pic" />
     <result column="url" jdbcType="VARCHAR" property="url" />
-    <result column="category" jdbcType="ARRAY" property="category" typeHandler="com.smzdm.typehandler.IntArrayHandler"/>
+    <result column="category" jdbcType="ARRAY" property="category" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
     <result column="brand" jdbcType="VARCHAR" property="brand" />
     <result column="rmb_price" jdbcType="DOUBLE" property="rmbPrice" />
     <result column="is_discovery" jdbcType="BIT" property="isDiscovery" />
@@ -48,7 +48,7 @@
       date)
     values (#{articleId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
       #{contentAll,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{price,jdbcType=VARCHAR}, 
-      #{yhType,jdbcType=VARCHAR}, #{pic,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.IntArrayHandler},
+      #{yhType,jdbcType=VARCHAR}, #{pic,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
       #{brand,jdbcType=VARCHAR}, #{rmbPrice,jdbcType=DOUBLE}, #{isDiscovery,jdbcType=BIT}, 
       #{mall,jdbcType=VARCHAR}, #{channel,jdbcType=VARCHAR}, #{timeSort,jdbcType=BIGINT},
       #{date,jdbcType=DATE})
@@ -68,7 +68,7 @@
       yh_type = #{yhType,jdbcType=VARCHAR},
       pic = #{pic,jdbcType=VARCHAR},
       url = #{url,jdbcType=VARCHAR},
-      category = #{category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.IntArrayHandler},
+      category = #{category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
       brand = #{brand,jdbcType=VARCHAR},
       rmb_price = #{rmbPrice,jdbcType=DOUBLE},
       is_discovery = #{isDiscovery,jdbcType=BIT},

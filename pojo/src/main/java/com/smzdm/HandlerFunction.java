@@ -41,17 +41,17 @@ public enum HandlerFunction {
     CATEGORY(x -> {
         JSONArray array = JSONArray.parseArray(x);
         int size = array.size();
-        Integer[] ints = new Integer[size];
+        Short[] shorts = new Short[size];
         for (int i = 0; i < size; i++) {
-            ints[i] = array.getJSONObject(i).getInteger("ID");
+            shorts[i] = array.getJSONObject(i).getShort("ID");
         }
-        return ints;
+        return shorts;
     }),
     PARENTS(x -> {
         String[] split = x.split(",");
-        Integer[] ids = new Integer[split.length];
+        Short[] ids = new Short[split.length];
         for (int i = 0; i < split.length; i++) {
-            ids[i] = Integer.valueOf(split[i]);
+            ids[i] = Short.valueOf(split[i]);
         }
         return ids;
     });

@@ -9,7 +9,7 @@
     -->
     insert into category (id, title, parent_ids,nick_title) values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=SMALLINT}, #{item.title,jdbcType=VARCHAR}, #{item.parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.IntArrayHandler},#{item.nickTitle,jdbcType=VARCHAR})
+      (#{item.id,jdbcType=SMALLINT}, #{item.title,jdbcType=VARCHAR}, #{item.parentIds,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},#{item.nickTitle,jdbcType=VARCHAR})
     </foreach>
   </insert>
 </mapper>
