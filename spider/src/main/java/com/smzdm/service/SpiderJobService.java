@@ -67,7 +67,7 @@ public class SpiderJobService {
 
     private void generateArticleInfo(List<JSONObject> jsonList) {
         LocalDateTime now = LocalDateTime.now();
-        List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).filter(x -> x.getWorthy() != null).collect(toList());
+        List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
         infoList.forEach(x -> x.setUpdateTime(now));
         articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
         articleInfoMapper.insertHistoryList(infoList);
@@ -77,7 +77,7 @@ public class SpiderJobService {
     private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {
         String key = spiderConfig.getRedisKey();
         boolean discovery = spiderConfig.isDiscovery();
-        long timeSort = Optional.ofNullable(longValueTemplate.opsForValue().get(key)).orElse(0L);
+        long timeSort = Long.valueOf(Optional.ofNullable(stringRedisTemplate.opsForValue().get(key)).orElse("0"));
         generateArticleJson(jsonList, discovery, timeSort);
         longValueTemplate.opsForValue().set(key, generateArticle(jsonList, discovery, timeSort));
     }
@@ -124,7 +124,7 @@ public class SpiderJobService {
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
             stringRedisTemplate.opsForSet().add(key, streamMembers.toArray(new String[streamMembers.size()]));
-            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'","''") + "'"));
+            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'", "''") + "'"));
         }
     }
 }
