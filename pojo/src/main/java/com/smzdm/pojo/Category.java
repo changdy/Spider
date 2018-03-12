@@ -11,7 +11,7 @@ public class Category {
     @Handler("title")
     private String title;
     @Handler( value = "parent_ids", function = HandlerFunction.PARENTS)
-    private Integer[] parentIds;
+    private Short[] parentIds;
     @Handler("url_nicktitle")
     private String nickTitle;
 }

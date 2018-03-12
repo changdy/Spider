@@ -51,6 +51,9 @@ public enum HandlerFunction {
         String[] split = x.split(",");
         Short[] ids = new Short[split.length];
         for (int i = 0; i < split.length; i++) {
+            if ("".equals(split[i])) {
+                continue;
+            }
             ids[i] = Short.valueOf(split[i]);
         }
         return ids;

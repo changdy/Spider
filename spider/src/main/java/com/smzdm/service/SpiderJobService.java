@@ -89,9 +89,9 @@ public class SpiderJobService {
         for (TypeRelationEnum value : TypeRelationEnum.values()) {
             updateRedisType(articles, value.getKey(), value.getFunction());
         }
-        if (discovery) {
-            Set<Long> redisCategories = longValueTemplate.opsForSet().members(CATEGORY_IDS);
-            Set<Category> newCategories = jsonList.stream().flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().longValue())).collect(toSet());
+        if (!discovery) {
+            Set<String> redisCategories = stringRedisTemplate.opsForSet().members(CATEGORY_IDS);
+            Set<Category> newCategories = jsonList.stream().filter(x->x.containsKey("category_layer")).flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().toString())).collect(toSet());
             if (newCategories.size() > 0) {
                 longValueTemplate.opsForSet().add(CATEGORY_IDS, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
                 categoryMapper.insertList(newCategories);

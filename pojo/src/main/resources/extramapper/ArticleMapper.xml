@@ -22,10 +22,10 @@
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.articleId,jdbcType=INTEGER}, #{item.title,jdbcType=VARCHAR}, #{item.content,jdbcType=VARCHAR},
-            #{item.contentAll,jdbcType=VARCHAR}, #{item.type}, #{item.price,jdbcType=VARCHAR},
-            #{item.yhType}, #{item.pic,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
+            #{item.contentAll,jdbcType=VARCHAR}, CAST(#{item.type,jdbcType=VARCHAR} AS ARTICLE_TYPE), #{item.price,jdbcType=VARCHAR},
+            CAST(#{item.yhType,jdbcType=VARCHAR} AS yh_type), #{item.pic,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.category,jdbcType=ARRAY,typeHandler=com.smzdm.typehandler.ShortArrayHandler},
             #{item.brand,jdbcType=VARCHAR}, #{item.rmbPrice,jdbcType=DOUBLE}, #{item.isDiscovery,jdbcType=BIT},
-            #{item.mall}, #{item.channel}, #{item.timeSort,jdbcType=BIGINT},
+            CAST(#{item.mall,jdbcType=VARCHAR} AS ARTICLE_MALL), CAST(#{item.channel,jdbcType=VARCHAR} AS ARTICLE_CHANNEL), #{item.timeSort,jdbcType=BIGINT},
             #{item.date,jdbcType=DATE})
         </foreach>
     </insert>

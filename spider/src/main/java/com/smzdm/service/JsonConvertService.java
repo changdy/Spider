@@ -24,7 +24,7 @@ public class JsonConvertService {
                 Object result;
                 Handler handler = field.getDeclaredAnnotation(Handler.class);
                 String value = getFiledValue(json, handler.value().split("\\|"));
-                if (value == null || "".equals(value)) {
+                if (value == null || "".equals(value.trim())) {
                     continue;
                 }
                 HandlerFunction handlerFunction = handler.function();
