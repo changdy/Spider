@@ -124,7 +124,7 @@ public class SpiderJobService {
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
             stringRedisTemplate.opsForSet().add(key, streamMembers.toArray(new String[streamMembers.size()]));
-            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x + "'"));
+            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'","''") + "'"));
         }
     }
 }
