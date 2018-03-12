@@ -12,16 +12,16 @@ public class ArticleInfo {
     @Handler("article_id")
     private Integer articleId;
     @Handler("article_comment")
-    private Short comment;
+    private Short comment = 0;
     @Handler("article_collection")
-    private Short collection;
-    @Handler("article_worthy")
-    private Short worthy;
+    private Short collection = 0;
+    @Handler("article_worthy|article_rating")
+    private Short worthy = 0;
     @Handler("article_unworthy")
-    private Short unworthy;
+    private Short unworthy = 0;
     @Handler("article_is_sold_out|is_out")
-    private Boolean soldOut;
-    @Handler("article_is_timeout")
-    private Boolean timeout;
+    private Boolean soldOut = false;
+    @Handler("article_is_timeout|is_timeout")
+    private Boolean timeout = false;
     private LocalDateTime updateTime;
 }
