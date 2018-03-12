@@ -2,6 +2,7 @@ package com.smzdm.mapper;
 
 
 import com.smzdm.pojo.Category;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,4 +50,7 @@ public interface CategoryMapper {
     int updateByPrimaryKey(Category record);
 
     void insertList(Collection<Category> categories);
+
+    @Select("SELECT ID FROM category;")
+    Long[] getIDArray();
 }

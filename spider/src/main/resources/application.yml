@@ -19,3 +19,5 @@ logging:
     root: info
     com.ibatis: TRACE
     com.smzdm: debug
+custom:
+  category-key: category_ids

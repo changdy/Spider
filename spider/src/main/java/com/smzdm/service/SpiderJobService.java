@@ -9,6 +9,7 @@ import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
 import com.smzdm.pojo.Category;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,8 @@ public class SpiderJobService {
     private RedisTemplate<String, Long> longValueTemplate;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    private static final String CATEGORY_IDS = "category_ids";
+    @Value("${custom.category-key}")
+    private String categoryKey;
 
     public void getInfo(SpiderConfigEnum spiderConfig) {
         Spider spider = Spider.create(infoSpiderConfig);
@@ -83,21 +84,23 @@ public class SpiderJobService {
 
     private Long generateArticle(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
         List<Article> articles = jsonList.stream().filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).collect(toList());
-        List<Integer> ids = articles.stream().map(Article::getArticleId).collect(toList());
-        articleMapper.deleteByIDList(ids);
-        articles.forEach(x -> x.setIsDiscovery(discovery));
-        for (TypeRelationEnum value : TypeRelationEnum.values()) {
-            updateRedisType(articles, value.getKey(), value.getFunction());
-        }
-        if (!discovery) {
-            Set<String> redisCategories = stringRedisTemplate.opsForSet().members(CATEGORY_IDS);
-            Set<Category> newCategories = jsonList.stream().filter(x->x.containsKey("category_layer")).flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().toString())).collect(toSet());
-            if (newCategories.size() > 0) {
-                longValueTemplate.opsForSet().add(CATEGORY_IDS, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
-                categoryMapper.insertList(newCategories);
+        if (articles.size() > 0) {
+            List<Integer> ids = articles.stream().map(Article::getArticleId).collect(toList());
+            articleMapper.deleteByIDList(ids);
+            articles.forEach(x -> x.setIsDiscovery(discovery));
+            for (TypeRelationEnum value : TypeRelationEnum.values()) {
+                updateRedisType(articles, value.getKey(), value.getFunction());
             }
+            if (!discovery) {
+                Set<String> redisCategories = stringRedisTemplate.opsForSet().members(categoryKey);
+                Set<Category> newCategories = jsonList.stream().filter(x -> x.containsKey("category_layer")).flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().toString())).collect(toSet());
+                if (newCategories.size() > 0) {
+                    longValueTemplate.opsForSet().add(categoryKey, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
+                    categoryMapper.insertList(newCategories);
+                }
+            }
+            articleMapper.insertList(articles);
         }
-        articleMapper.insertList(articles);
         return articles.stream().map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);
     }
 

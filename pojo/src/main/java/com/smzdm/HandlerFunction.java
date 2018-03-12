@@ -48,12 +48,12 @@ public enum HandlerFunction {
         return shorts;
     }),
     PARENTS(x -> {
+        if (x.indexOf(",") == 0) {
+            x = x.substring(1);
+        }
         String[] split = x.split(",");
         Short[] ids = new Short[split.length];
         for (int i = 0; i < split.length; i++) {
-            if ("".equals(split[i])) {
-                continue;
-            }
             ids[i] = Short.valueOf(split[i]);
         }
         return ids;

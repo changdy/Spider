@@ -17,7 +17,6 @@ public class InfoSpiderConfig implements PageProcessor {
 
     @Override
     public void process(Page page) {
-        System.out.println(page.getUrl());
         Object parse = JSON.parse(page.getRawText());
         if (parse instanceof JSONObject) {
             page.putField("json", ((JSONObject) parse).getJSONArray("data"));
