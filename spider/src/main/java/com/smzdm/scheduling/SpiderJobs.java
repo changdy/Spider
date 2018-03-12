@@ -1,25 +1,35 @@
 package com.smzdm.scheduling;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import com.smzdm.Enum.TypeRelationEnum;
+import com.smzdm.mapper.EnumMapper;
+import com.smzdm.service.SpiderJobService;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 
 @Component
 public class SpiderJobs {
 
 
+    @Resource
+    private SpiderJobService spiderJob;
 
-    @Scheduled(fixedDelay = 120 * 1000)
-    public void homePageSpider() {
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
+    @Resource
+    private EnumMapper enumMapper;
+
+    @PostConstruct()
+    public void initRedis() {
+        TypeRelationEnum[] enums = TypeRelationEnum.values();
+        for (TypeRelationEnum value : enums) {
+            String[] values = enumMapper.getEnum(value.getKey().split(":")[1]);
+            stringRedisTemplate.delete(value.getKey());
+            stringRedisTemplate.opsForSet().add(value.getKey(), values);
+        }
     }
-
-    @Scheduled(cron = "30 0/3 * * * ?")
-    public void startDiscoverySpider() {
-        //Long timeSort = Optional.ofNullable(stringRedisTemplate.opsForValue().get("timeSort:discovery")).map(Long::valueOf).orElse(0L);
-        //Spider spider = Spider.create(infoSpiderConfig);
-        //List<ResultItems> all = spider.getAll(new ArrayList<>());
-        //spider.close();
-    }
-
 }

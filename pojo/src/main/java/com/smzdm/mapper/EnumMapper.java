@@ -10,17 +10,8 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface EnumMapper {
 
-    @Select("select unnest( enum_range(null::article_channel)); ")
-    String[] getChannels();
-
-    @Select("select unnest( enum_range(null::article_mall)); ")
-    String[] getMalls();
-
-    @Select("select unnest( enum_range(null::yh_type)); ")
-    String[] getYouHuiTypes();
-
-    @Select("select unnest( enum_range(null::article_type)); ")
-    String[] getArticleTypes();
+    @Select("select unnest( enum_range(null::${name})); ")
+    String[] getEnum(@Param("name")String name);
 
     @Update("ALTER TYPE ${enumName} ADD VALUE ${item};")
     int addEnum(@Param("enumName") String enumName, @Param("item") String item);
