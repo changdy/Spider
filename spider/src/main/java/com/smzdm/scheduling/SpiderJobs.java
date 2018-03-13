@@ -1,7 +1,7 @@
 package com.smzdm.scheduling;
 
-import com.smzdm.Enum.SpiderConfigEnum;
-import com.smzdm.Enum.TypeRelationEnum;
+import com.smzdm.enums.SpiderConfigEnum;
+import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.mapper.EnumMapper;
 import com.smzdm.service.SpiderJobService;

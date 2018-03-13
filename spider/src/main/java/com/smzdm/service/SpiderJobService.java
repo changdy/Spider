@@ -2,8 +2,8 @@ package com.smzdm.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.smzdm.Enum.SpiderConfigEnum;
-import com.smzdm.Enum.TypeRelationEnum;
+import com.smzdm.enums.SpiderConfigEnum;
+import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.*;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;

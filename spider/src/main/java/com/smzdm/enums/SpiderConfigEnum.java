@@ -1,4 +1,4 @@
-package com.smzdm.num;
+package com.smzdm.enums;
 
 /**
  * Created by Changdy on 2018/3/8.
