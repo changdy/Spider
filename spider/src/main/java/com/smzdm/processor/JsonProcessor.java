@@ -1,4 +1,4 @@
-package com.smzdm.config;
+package com.smzdm.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -11,8 +11,8 @@ import us.codecraft.webmagic.processor.PageProcessor;
 /**
  * Created by Changdy on 2017/8/18.
  */
-@Service("infoSpiderConfig")
-public class InfoSpiderConfig implements PageProcessor {
+@Service("jsonProcessor")
+public class JsonProcessor implements PageProcessor {
     private static final Site SITE = Site.me().setRetryTimes(5).setSleepTime(1500).setUseGzip(true).setRetrySleepTime(5000);
 
     @Override

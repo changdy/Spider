@@ -28,8 +28,8 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class SpiderJobService {
 
-    @Resource(name = "infoSpiderConfig")
-    private PageProcessor infoSpiderConfig;
+    @Resource(name = "jsonProcessor")
+    private PageProcessor jsonProcessor;
     @Resource
     private JsonConvertService jsonConvertService;
     @Resource
@@ -50,7 +50,7 @@ public class SpiderJobService {
     private String categoryKey;
 
     public void getInfo(SpiderConfigEnum spiderConfig) {
-        Spider spider = Spider.create(infoSpiderConfig);
+        Spider spider = Spider.create(jsonProcessor);
         List<String> strings = Arrays.asList(spiderConfig.getUrl());
         List<ResultItems> resultItems = spider.getAll(strings);
         spider.close();

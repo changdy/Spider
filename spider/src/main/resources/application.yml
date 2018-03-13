@@ -19,5 +19,7 @@ logging:
     root: info
     com.ibatis: TRACE
     com.smzdm: debug
+  path: /home/logs/spider/
+  file: spider.log
 custom:
   category-key: category_ids
