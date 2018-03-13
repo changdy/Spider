@@ -1,4 +1,4 @@
-package com.smzdm.Enum;
+package com.smzdm.num;
 
 import com.smzdm.pojo.Article;
 
