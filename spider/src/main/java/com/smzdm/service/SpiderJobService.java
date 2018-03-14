@@ -48,6 +48,8 @@ public class SpiderJobService {
     private StringRedisTemplate stringRedisTemplate;
     @Value("${custom.category-key}")
     private String categoryKey;
+    @Value("${custom.category_list}")
+    private String categoryList;
 
     public void getInfo(SpiderConfigEnum spiderConfig) {
         Spider spider = Spider.create(jsonProcessor);
@@ -97,6 +99,9 @@ public class SpiderJobService {
                 if (newCategories.size() > 0) {
                     longValueTemplate.opsForSet().add(categoryKey, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
                     categoryMapper.insertList(newCategories);
+                    Map<String, String> map = new HashMap<>();
+                    newCategories.forEach(x -> map.put(x.getTitle(), String.valueOf(x.getId())));
+                    stringRedisTemplate.opsForHash().putAll(categoryList, map);
                 }
             }
             articleMapper.insertList(articles);

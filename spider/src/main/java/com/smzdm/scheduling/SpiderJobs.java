@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Component
@@ -29,6 +31,8 @@ public class SpiderJobs {
     private CategoryMapper categoryMapper;
     @Value("${custom.category-key}")
     private String categoryKey;
+    @Value("${custom.category_list}")
+    private String categoryList;
 
     @PostConstruct()
     public void initRedis() {
@@ -43,6 +47,9 @@ public class SpiderJobs {
         if (ids.length > 0) {
             longValueTemplate.opsForSet().add(categoryKey, ids);
         }
+        Map<String, String> map = new HashMap<>();
+        categoryMapper.getCategoryMap().forEach(x -> map.put((String) x.get("title"), String.valueOf((Integer) x.get("id"))));
+        stringRedisTemplate.opsForHash().putAll(categoryList, map);
     }
 
     @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 6 * 1000)
