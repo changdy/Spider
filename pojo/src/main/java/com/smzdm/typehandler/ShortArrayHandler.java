@@ -9,6 +9,7 @@ import java.sql.*;
  * Created by Changdy on 2018/1/27.
  */
 public class ShortArrayHandler extends BaseTypeHandler<Short[]> {
+
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Short[] parameter, JdbcType jdbcType) throws SQLException {
         Connection conn = ps.getConnection();
@@ -35,6 +36,16 @@ public class ShortArrayHandler extends BaseTypeHandler<Short[]> {
         if (value == null) {
             return null;
         }
-        return (Short[]) value.getArray();
+        Object valueArray = value.getArray();
+        if (valueArray instanceof Integer[]) {
+            Integer[] array = (Integer[]) valueArray;
+            Short[] shorts = new Short[array.length];
+            for (int i = 0; i < array.length; i++) {
+                shorts[i] = array[i].shortValue();
+            }
+            return shorts;
+        } else {
+            return (Short[]) valueArray;
+        }
     }
 }
