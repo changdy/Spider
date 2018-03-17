@@ -41,7 +41,7 @@ public class SpiderJobService {
     @Resource
     private CategoryMapper categoryMapper;
     @Resource
-    private EnumMapper enumMapper;
+    private BaseEnumMapper baseEnumMapper;
     @Resource(name = "longValueTemplate")
     private RedisTemplate<String, Long> longValueTemplate;
     @Resource
@@ -129,7 +129,7 @@ public class SpiderJobService {
         streamMembers.removeAll(redisMembers);
         if (streamMembers.size() > 0) {
             stringRedisTemplate.opsForSet().add(key, streamMembers.toArray(new String[streamMembers.size()]));
-            streamMembers.forEach(x -> enumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'", "''") + "'"));
+            streamMembers.forEach(x -> baseEnumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'", "''") + "'"));
         }
     }
 }

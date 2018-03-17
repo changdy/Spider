@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Update;
 /**
  * Created by Changdy on 2018/3/7.
  */
-public interface EnumMapper {
+public interface BaseEnumMapper {
 
     @Select("select unnest( enum_range(null::${name})); ")
     String[] getEnum(@Param("name")String name);

@@ -2,8 +2,8 @@ package com.smzdm.scheduling;
 
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
+import com.smzdm.mapper.BaseEnumMapper;
 import com.smzdm.mapper.CategoryMapper;
-import com.smzdm.mapper.EnumMapper;
 import com.smzdm.service.SpiderJobService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,7 +24,7 @@ public class SpiderJobs {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
-    private EnumMapper enumMapper;
+    private BaseEnumMapper baseEnumMapper;
     @Resource(name = "longValueTemplate")
     private RedisTemplate<String, Long> longValueTemplate;
     @Resource
@@ -38,7 +38,7 @@ public class SpiderJobs {
     public void initRedis() {
         TypeRelationEnum[] enums = TypeRelationEnum.values();
         for (TypeRelationEnum value : enums) {
-            String[] values = enumMapper.getEnum(value.getKey().split(":")[1]);
+            String[] values = baseEnumMapper.getEnum(value.getKey().split(":")[1]);
             stringRedisTemplate.delete(value.getKey());
             stringRedisTemplate.opsForSet().add(value.getKey(), values);
         }
@@ -57,7 +57,7 @@ public class SpiderJobs {
         spiderJob.getInfo(SpiderConfigEnum.homeConfig);
     }
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 10 * 1000)
+    //@Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 10 * 1000)
     public void discoverySpider() {
         spiderJob.getInfo(SpiderConfigEnum.latestConfig);
     }
