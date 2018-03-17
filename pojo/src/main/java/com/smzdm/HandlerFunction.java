@@ -57,6 +57,20 @@ public enum HandlerFunction {
             ids[i] = Short.valueOf(split[i]);
         }
         return ids;
+    }),
+    CHANNEL(x -> {
+        switch (x) {
+            case "21":
+                return "个人";
+            case "5":
+                return "海淘精选";
+            case "1":
+                return "优惠精选";
+            case "2":
+                return "优惠";
+            default:
+                return x;
+        }
     });
 
     private Function<String, Object> function;

@@ -38,7 +38,7 @@ public class Article {
     private Boolean isDiscovery;
     @Handler("article_mall")
     private String mall;
-    @Handler("article_channel")
+    @Handler(value = "article_channel",function =HandlerFunction.CHANNEL )
     private String channel;
     @Handler("timesort")
     private Long timeSort;
