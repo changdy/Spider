@@ -58,6 +58,15 @@ public enum HandlerFunction {
         }
         return ids;
     }),
+    SHORT(x -> {
+        if (x.contains("K")) {
+            float value = Float.valueOf(x.replaceAll("K", ""));
+            Float v = value * 1000;
+            return v.shortValue();
+        } else {
+            return Short.valueOf(x);
+        }
+    }),
     CHANNEL(x -> {
         switch (x) {
             case "21":

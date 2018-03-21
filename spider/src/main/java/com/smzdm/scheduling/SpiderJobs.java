@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class SpiderJobs {
     @Value("${custom.turn}")
     private String turn;
 
-    //@PostConstruct()
+    @PostConstruct()
     public void initRedis() {
         TypeRelationEnum[] enums = TypeRelationEnum.values();
         for (TypeRelationEnum value : enums) {
