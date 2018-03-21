@@ -22,5 +22,4 @@ logging:
   path: /home/logs/spider/
   file: spider.log
 custom:
-  category-key: category_ids
-  category_list: category_list
+  turn: home:turn

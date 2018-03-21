@@ -4,52 +4,46 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
-import com.smzdm.mapper.*;
+import com.smzdm.mapper.ArticleInfoMapper;
+import com.smzdm.mapper.ArticleJsonMapper;
+import com.smzdm.mapper.ArticleMapper;
+import com.smzdm.mapper.BaseEnumMapper;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
 import com.smzdm.pojo.Category;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @Service
 public class SpiderJobService {
 
-    @Resource(name = "jsonProcessor")
+    @Autowired
+    private Category[] categories;
+    @Autowired
     private PageProcessor jsonProcessor;
-    @Resource
-    private JsonConvertService jsonConvertService;
-    @Resource
+    @Autowired
     private ArticleMapper articleMapper;
-    @Resource
-    private ArticleInfoMapper articleInfoMapper;
-    @Resource
-    private ArticleJsonMapper articleJsonMapper;
-    @Resource
-    private CategoryMapper categoryMapper;
-    @Resource
+    @Autowired
     private BaseEnumMapper baseEnumMapper;
-    @Resource(name = "longValueTemplate")
-    private RedisTemplate<String, Long> longValueTemplate;
-    @Resource
+    @Autowired
+    private ArticleInfoMapper articleInfoMapper;
+    @Autowired
+    private ArticleJsonMapper articleJsonMapper;
+    @Autowired
+    private JsonConvertService jsonConvertService;
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Value("${custom.category-key}")
-    private String categoryKey;
-    @Value("${custom.category_list}")
-    private String categoryList;
 
     public void getInfo(SpiderConfigEnum spiderConfig) {
         Spider spider = Spider.create(jsonProcessor);
@@ -81,7 +75,7 @@ public class SpiderJobService {
         boolean discovery = spiderConfig.isDiscovery();
         long timeSort = Long.valueOf(Optional.ofNullable(stringRedisTemplate.opsForValue().get(key)).orElse("0"));
         generateArticleJson(jsonList, discovery, timeSort);
-        longValueTemplate.opsForValue().set(key, generateArticle(jsonList, discovery, timeSort));
+        stringRedisTemplate.opsForValue().set(key, String.valueOf(generateArticle(jsonList, discovery, timeSort)));
     }
 
     private Long generateArticle(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
@@ -89,20 +83,16 @@ public class SpiderJobService {
         if (articles.size() > 0) {
             List<Integer> ids = articles.stream().map(Article::getArticleId).collect(toList());
             articleMapper.deleteByIDList(ids);
-            articles.forEach(x -> x.setIsDiscovery(discovery));
             for (TypeRelationEnum value : TypeRelationEnum.values()) {
                 updateRedisType(articles, value.getKey(), value.getFunction());
             }
-            if (!discovery) {
-                Set<String> redisCategories = stringRedisTemplate.opsForSet().members(categoryKey);
-                Set<Category> newCategories = jsonList.stream().filter(x -> x.containsKey("category_layer")).flatMap(x -> x.getJSONArray("category_layer").stream().map(y -> jsonConvertService.convertToCategory((JSONObject) y))).filter(z -> !redisCategories.contains(z.getId().toString())).collect(toSet());
-                if (newCategories.size() > 0) {
-                    longValueTemplate.opsForSet().add(categoryKey, newCategories.stream().map(x -> x.getId().longValue()).distinct().toArray(Long[]::new));
-                    categoryMapper.insertList(newCategories);
-                    Map<String, String> map = new HashMap<>();
-                    newCategories.forEach(x -> map.put(x.getTitle(), String.valueOf(x.getId())));
-                    stringRedisTemplate.opsForHash().putAll(categoryList, map);
+            if (discovery) {
+                for (Article article : articles) {
+                    article.setIsDiscovery(true);
+                    article.setCategory(getCategoryID(article.getCategoryStr()));
                 }
+            } else {
+                articles.forEach(x -> x.setIsDiscovery(false));
             }
             articleMapper.insertList(articles);
         }
@@ -131,5 +121,40 @@ public class SpiderJobService {
             stringRedisTemplate.opsForSet().add(key, streamMembers.toArray(new String[streamMembers.size()]));
             streamMembers.forEach(x -> baseEnumMapper.addEnum(key.split(":")[1], "'" + x.replaceAll("'", "''") + "'"));
         }
+    }
+
+    private Short[] getCategoryID(String categoryStr) {
+        if (categoryStr != null) {
+            if (categoryStr.indexOf("/") == 0) {
+                categoryStr = categoryStr.substring(1);
+            }
+            if (categoryStr.length() > 0) {
+                String[] split = categoryStr.split("/");
+                if (!split[0].equals("无")) {
+                    int length = split.length;
+                    int count = 0;
+                    for (String s : split) {
+                        if (null == s || s.equals("无")) {
+                            count++;
+                        }
+                    }
+                    Short[] arr = new Short[length - count];
+                    for (int i = 0; i < length - count; i++) {
+                        arr[i] = checkInArr(split[i]);
+                    }
+                    return arr;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Short checkInArr(String title) {
+        for (Category category : categories) {
+            if (category.getTitle().equals(title)) {
+                return category.getId();
+            }
+        }
+        return null;
     }
 }

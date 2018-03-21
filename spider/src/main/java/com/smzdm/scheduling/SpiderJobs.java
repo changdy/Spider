@@ -3,38 +3,29 @@ package com.smzdm.scheduling;
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.BaseEnumMapper;
-import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.service.SpiderJobService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.Optional;
 
 
 @Component
 public class SpiderJobs {
-    @Resource
+    @Autowired
     private SpiderJobService spiderJob;
-    @Resource
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Resource
+    @Autowired
     private BaseEnumMapper baseEnumMapper;
-    @Resource(name = "longValueTemplate")
-    private RedisTemplate<String, Long> longValueTemplate;
-    @Resource
-    private CategoryMapper categoryMapper;
-    @Value("${custom.category-key}")
-    private String categoryKey;
-    @Value("${custom.category_list}")
-    private String categoryList;
+    @Value("${custom.turn}")
+    private String turn;
 
-    @PostConstruct()
+    //@PostConstruct()
     public void initRedis() {
         TypeRelationEnum[] enums = TypeRelationEnum.values();
         for (TypeRelationEnum value : enums) {
@@ -42,24 +33,44 @@ public class SpiderJobs {
             stringRedisTemplate.delete(value.getKey());
             stringRedisTemplate.opsForSet().add(value.getKey(), values);
         }
-        longValueTemplate.delete(categoryKey);
-        Long[] ids = categoryMapper.getIDArray();
-        if (ids.length > 0) {
-            longValueTemplate.opsForSet().add(categoryKey, ids);
-        }
-        Map<String, String> map = new HashMap<>();
-        categoryMapper.getCategoryMap().forEach(x -> map.put((String) x.get("title"), String.valueOf((Integer) x.get("id"))));
-        stringRedisTemplate.opsForHash().putAll(categoryList, map);
     }
 
     @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 6 * 1000)
     public void homePageSpider() {
+        LocalTime now = LocalTime.now();
+        //6点前要没必要那么频繁
+        if (now.getHour() < 7) {
+            Integer integer = Integer.valueOf(Optional.ofNullable(stringRedisTemplate.opsForValue().get(turn)).orElse("0"));
+            int remainder = integer % 4;
+            stringRedisTemplate.opsForValue().set(turn, String.valueOf(remainder + 1));
+            if (remainder != 0) {
+                return;
+            }
+        }
         spiderJob.getInfo(SpiderConfigEnum.homeConfig);
     }
 
-    //@Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 10 * 1000)
+
+    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 6 * 1000)
+    public void homeHistorySpider() {
+        LocalTime now = LocalTime.now();
+        //6点前要没必要那么频繁
+        if (now.getHour() > 7 || now.getHour() < 23) {
+            spiderJob.getInfo(SpiderConfigEnum.homeHistoryConfig);
+        }
+    }
+
+    @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 10 * 1000)
     public void discoverySpider() {
         spiderJob.getInfo(SpiderConfigEnum.latestConfig);
+    }
+
+    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 6 * 1000)
+    public void hotSpider() {
+        LocalTime now = LocalTime.now();
+        if (now.getHour() > 7 || now.getHour() < 23) {
+            spiderJob.getInfo(SpiderConfigEnum.hotItemConfig);
+        }
     }
 
 }

@@ -31,7 +31,7 @@ public class Article {
     private Short[] category;
     @Handler("gtm.brand")
     private String brand;
-    @Handler(value = "gtm.cates_str", regPattern = "/无")
+    @Handler(value = "gtm.cates_str")
     private String categoryStr;
     @Handler(value = "gtm.rmb_price", function = HandlerFunction.PRICE)
     private Double rmbPrice;
