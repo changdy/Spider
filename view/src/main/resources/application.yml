@@ -12,7 +12,7 @@ spring:
     username: postgres
     password: rootpwd
 mybatis:
-  mapper-locations: classpath:basemapper/*.xml,classpath:extramapper/*.xml
+  mapper-locations: classpath:mapper/*.xml
   type-handlers-package: com.smzdm.typehandler
 logging:
   level:
