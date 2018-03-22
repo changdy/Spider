@@ -23,3 +23,4 @@ logging:
   file: spider.log
 custom:
   turn: home:turn
+  unknown-category: unknown:category
