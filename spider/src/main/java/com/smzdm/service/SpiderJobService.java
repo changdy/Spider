@@ -13,6 +13,7 @@ import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
 import com.smzdm.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.ResultItems;
@@ -44,6 +45,19 @@ public class SpiderJobService {
     private JsonConvertService jsonConvertService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Value("${custom.unknown-category}")
+    private String unknownCategory;
+
+    private static final Map<String, Short[]> SPECIAL_CATEGORY = new HashMap<>();
+
+    //这几个比较奇葩
+    static {
+        SPECIAL_CATEGORY.put("食品保健/水饮/咖啡/速溶咖啡/伴侣", new Short[]{95, 101, 5610, 4901});
+        SPECIAL_CATEGORY.put("食品保健/生鲜食品/新鲜水果/车厘子/樱桃", new Short[]{95, 111, 853, 5615});
+        SPECIAL_CATEGORY.put("食品保健/生鲜食品/新鲜水果/奇异果/猕猴桃", new Short[]{95, 111, 853, 5616});
+        SPECIAL_CATEGORY.put("汽车消费/汽车装饰/车用功能用品/挂钩/托盘", new Short[]{147, 159, 551, 2683});
+        SPECIAL_CATEGORY.put("汽车消费/汽车装饰/车用功能用品/钥匙挂/包", new Short[]{147, 159, 551, 2681});
+    }
 
     public void getInfo(SpiderConfigEnum spiderConfig) {
         Spider spider = Spider.create(jsonProcessor);
@@ -130,6 +144,11 @@ public class SpiderJobService {
             }
             if (categoryStr.length() > 0) {
                 String[] split = categoryStr.split("/");
+                if (split.length == 5) {
+                    if (SPECIAL_CATEGORY.containsKey(categoryStr)) {
+                        SPECIAL_CATEGORY.get(categoryStr);
+                    }
+                }
                 if (!split[0].equals("无")) {
                     int length = split.length;
                     int count = 0;
@@ -146,6 +165,7 @@ public class SpiderJobService {
                 }
             }
         }
+        stringRedisTemplate.opsForList().rightPush(unknownCategory, categoryStr);
         return null;
     }
 
