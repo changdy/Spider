@@ -146,7 +146,7 @@ public class SpiderJobService {
                 String[] split = categoryStr.split("/");
                 if (split.length == 5) {
                     if (SPECIAL_CATEGORY.containsKey(categoryStr)) {
-                        SPECIAL_CATEGORY.get(categoryStr);
+                        return SPECIAL_CATEGORY.get(categoryStr);
                     }
                 }
                 if (!split[0].equals("无")) {
