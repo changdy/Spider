@@ -12,6 +12,7 @@ import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleJson;
 import com.smzdm.pojo.Category;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,6 +27,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Service
 public class SpiderJobService {
 
@@ -147,6 +149,9 @@ public class SpiderJobService {
                 if (split.length == 5) {
                     if (SPECIAL_CATEGORY.containsKey(categoryStr)) {
                         return SPECIAL_CATEGORY.get(categoryStr);
+                    } else {
+                        log.info("没有匹配");
+                        log.info("map长度:" + SPECIAL_CATEGORY.size() + " 当前字符串" + categoryStr);
                     }
                 }
                 if (!split[0].equals("无")) {
