@@ -13,6 +13,6 @@ public interface BaseEnumMapper {
     @Select("select unnest( enum_range(null::${name})); ")
     String[] getEnum(@Param("name")String name);
 
-    @Update("ALTER TYPE ${enumName} ADD VALUE ${item};")
+    @Update("ALTER TYPE ${enumName} ADD VALUE '${item}';")
     int addEnum(@Param("enumName") String enumName, @Param("item") String item);
 }
