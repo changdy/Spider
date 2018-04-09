@@ -2,10 +2,11 @@ package com.smzdm.pojo;
 
 
 import com.smzdm.Handler;
-import com.smzdm.HandlerFunction;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+
+import static com.smzdm.HandlerFunction.*;
 
 @Data
 public class Article {
@@ -27,21 +28,21 @@ public class Article {
     private String pic;
     @Handler("article_url")
     private String url;
-    @Handler(value = "category_layer", function = HandlerFunction.CATEGORY)
+    @Handler(value = "category_layer", function = CATEGORY)
     private Short[] category;
     @Handler("gtm.brand")
     private String brand;
     @Handler(value = "gtm.cates_str")
     private String categoryStr;
-    @Handler(value = "gtm.rmb_price", function = HandlerFunction.PRICE)
+    @Handler(value = "gtm.rmb_price", function = PRICE)
     private Double rmbPrice;
     private Boolean isDiscovery;
     @Handler("article_mall")
     private String mall;
-    @Handler(value = "article_channel",function =HandlerFunction.CHANNEL )
+    @Handler(value = "article_channel",function =CHANNEL )
     private String channel;
     @Handler("timesort")
     private Long timeSort;
-    @Handler(value = "article_date", function = HandlerFunction.DATE)
+    @Handler(value = "article_date", function = DATE)
     private LocalDateTime date;
 }
