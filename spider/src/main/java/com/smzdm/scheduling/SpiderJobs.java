@@ -4,6 +4,13 @@ import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.BaseEnumMapper;
 import com.smzdm.service.SpiderJobService;
+import com.smzdm.service.UpdateCategoryService;
+import com.smzdm.util.CodingUtil;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -11,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -25,6 +33,10 @@ public class SpiderJobs {
     private BaseEnumMapper baseEnumMapper;
     @Value("${custom.turn}")
     private String turn;
+    @Value("${custom.category-key}")
+    private String categoryKey;
+    @Autowired
+    private UpdateCategoryService updateCategoryService;
 
     @PostConstruct()
     public void initRedis() {
@@ -74,4 +86,20 @@ public class SpiderJobs {
         }
     }
 
+    //@Scheduled(cron = "0 0 2 * * ? ")
+    public void updateCategory() throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet("http://www.smzdm.com/fenlei/ajax_category_tree/");
+        httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+        CloseableHttpResponse execute = httpClient.execute(httpGet);
+        if (execute.getStatusLine().getStatusCode() == 200) {
+            String json = CodingUtil.decodeUnicode(EntityUtils.toString(execute.getEntity()));
+            String former = stringRedisTemplate.opsForValue().get(categoryKey);
+            if (!json.equals(former)) {
+                stringRedisTemplate.opsForValue().set(categoryKey, json);
+                updateCategoryService.insert(json);
+            }
+        }
+        httpClient.close();
+    }
 }

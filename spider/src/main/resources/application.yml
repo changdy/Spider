@@ -24,3 +24,4 @@ logging:
 custom:
   turn: home:turn
   unknown-category: unknown:category
+  category-key: categoryList
