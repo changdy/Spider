@@ -1,5 +1,8 @@
 package com.smzdm.scheduling;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.BaseEnumMapper;
@@ -93,13 +96,34 @@ public class SpiderJobs {
         httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
         CloseableHttpResponse execute = httpClient.execute(httpGet);
         if (execute.getStatusLine().getStatusCode() == 200) {
-            String json = CodingUtil.decodeUnicode(EntityUtils.toString(execute.getEntity()));
+            JSONArray jsonArray = JSON.parseArray(EntityUtils.toString(execute.getEntity()));
             String former = stringRedisTemplate.opsForValue().get(categoryKey);
-            if (!json.equals(former)) {
-                stringRedisTemplate.opsForValue().set(categoryKey, json);
-                updateCategoryService.insert(json);
+            if (!jsonArray.toJSONString().equals(former)) {
+                stringRedisTemplate.opsForValue().set(categoryKey, jsonArray.toJSONString());
+                updateCategoryService.insert(jsonArray.toJSONString());
             }
         }
         httpClient.close();
     }
+
+    private void deleteInfo(JSONArray jsonArray) {
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject temp = jsonArray.getJSONObject(i);
+            temp.remove("parent_id");
+            temp.remove("nicktitle");
+            temp.remove("smzdm_category_id");
+            temp.remove("category_class");
+            temp.remove("last_editor_id");
+            temp.remove("last_edit_time");
+            temp.remove("logourl");
+            temp.remove("username");
+            JSONArray child = temp.getJSONArray("child");
+            if (child != null && child.size() > 0) {
+                deleteInfo(child);
+            }
+        }
+
+    }
+
+
 }
