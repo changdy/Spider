@@ -8,39 +8,53 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class ProjectConfig {
-
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
 
     @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
         CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
-        loggingFilter.setIncludeClientInfo(true);
         loggingFilter.setIncludeQueryString(true);
         loggingFilter.setIncludePayload(true);
+        loggingFilter.setMaxPayloadLength(5000);
         return loggingFilter;
+    }
+
+    @Bean
+    public ValueOperations stringValueOperations() {
+        return stringRedisTemplate.opsForValue();
+    }
+
+    @Bean
+    public DateTimeFormatter dateTimeFormatter() {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     }
 
 
     @Autowired
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
+
     @PostConstruct
-    public void test() {
+    public void registerModule() {
         SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
             @Override
-            public void serialize(LocalDateTime value, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
-                jsonGenerator.writeNumber(dateTimeFormatter.format(value));
+            public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                gen.writeNumber(Timestamp.valueOf(value).getTime());
             }
         });
         mappingJackson2HttpMessageConverter.getObjectMapper().registerModule(module);

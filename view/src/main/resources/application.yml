@@ -19,3 +19,6 @@ logging:
     root: info
     com.ibatis: TRACE
     com.smzdm: debug
+    org.springframework.web.filter.CommonsRequestLoggingFilter: debug
+custom:
+  category-key: categoryList

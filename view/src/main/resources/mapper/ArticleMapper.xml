@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smzdm.mapper.ArticleMapper">
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM article i, article_info j WHERE i.article_id = j.article_id
+        <if test="isDiscovery!=null ">
+            AND is_discovery =#{isDiscovery}
+        </if>
+        <if test="worthy!=null ">
+            AND worthy >=#{worthy}
+        </if>
+        <if test="category!=null ">
+            AND #{category} @> category
+        </if>
+        <choose>
+            <when test="startTime!=null and endTime!=null">
+                AND date BETWEEN to_date(#{startTime},'YYYY-MM-DD') AND to_date(#{endTime},'YYYY-MM-DD')
+            </when>
+            <otherwise>
+                <if test="startTime!=null ">
+                    AND date >to_date(#{startTime},'YYYY-MM-DD')
+                </if>
+                <if test="endTime!=null ">
+                    AND to_date(#{endTime},'YYYY-MM-DD') > date
+                </if>
+            </otherwise>
+        </choose>
+        <if test="keyWords!=null and keyWords!=''">
+            AND to_tsvector('testzhcfg', title) @@ '${keyWords}'
+        </if>
+    </select>
+    <resultMap id="ArticleModelMap" type="com.smzdm.model.ArticleModel">
+        <result column="article_id" jdbcType="INTEGER" property="articleId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="price" jdbcType="VARCHAR" property="price"/>
+        <result column="yh_type" jdbcType="VARCHAR" property="yhType"/>
+        <result column="pic" jdbcType="VARCHAR" property="pic"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="brand" jdbcType="VARCHAR" property="brand"/>
+        <result column="mall" jdbcType="VARCHAR" property="mall"/>
+        <result column="channel" jdbcType="VARCHAR" property="channel"/>
+        <result column="date" jdbcType="DATE" property="date"/>
+        <result column="comment" jdbcType="SMALLINT" property="comment"/>
+        <result column="collection" jdbcType="SMALLINT" property="collection"/>
+        <result column="worthy" jdbcType="SMALLINT" property="worthy"/>
+        <result column="unworthy" jdbcType="SMALLINT" property="unworthy"/>
+        <result column="sold_out" jdbcType="BIT" property="soldOut"/>
+        <result column="timeout" jdbcType="BIT" property="timeout"/>
+        <result column="category_title" jdbcType="VARCHAR" property="categoryTitle"/>
+    </resultMap>
+
+    <select id="queryArticle"  resultMap="ArticleModelMap">
+        SELECT
+          i.article_id,
+          i.title,
+          i.content,
+          i.type,
+          i.price,
+          i.yh_type,
+          i.pic,
+          i.url,
+          i.brand,
+          i.mall,
+          i.channel,
+          i.date,
+          j.comment,
+          j.collection,
+          j.worthy,
+          j.unworthy,
+          j.sold_out,
+          j.timeout,
+          k.title AS category_title
+        FROM article i, article_info j, category_info k  WHERE i.article_id = j.article_id AND category = category_arr
+        <if test="isDiscovery!=null ">
+            AND is_discovery =#{isDiscovery}
+        </if>
+        <if test="worthy!=null ">
+            AND worthy >=#{worthy}
+        </if>
+        <if test="category!=null ">
+            AND #{category} @> category
+        </if>
+        <choose>
+            <when test="startTime!=null and endTime!=null">
+                AND date BETWEEN to_date(#{startTime},'YYYY-MM-DD') AND to_date(#{endTime},'YYYY-MM-DD')
+            </when>
+            <otherwise>
+                <if test="startTime!=null ">
+                    AND date >to_date(#{startTime},'YYYY-MM-DD')
+                </if>
+                <if test="endTime!=null ">
+                    AND to_date(#{endTime},'YYYY-MM-DD') > date
+                </if>
+            </otherwise>
+        </choose>
+        <if test="keyWords!=null and keyWords!=''">
+            AND to_tsvector('testzhcfg', i.title) @@ '${keyWords}'
+        </if>
+        ORDER BY #{orderBy}
+        <if test="desc = true ">
+            desc
+        </if>
+        limit #{pageSize}  OFFSET #{offset}
+    </select>
+</mapper>
