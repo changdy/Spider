@@ -22,3 +22,4 @@ logging:
     org.springframework.web.filter.CommonsRequestLoggingFilter: debug
 custom:
   category-key: categoryList
+  search-url: "https://api.smzdm.com/v1/list?keyword={0}&type={1}&order=time&limit=100&offset={2}"
