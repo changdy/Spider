@@ -1,6 +1,8 @@
 package com.smzdm.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.smzdm.mapper.ArticleMapper;
 import com.smzdm.model.ArticleModel;
 import com.smzdm.model.ArticleSearch;
@@ -26,6 +28,7 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Changdy on 2018/3/26.
@@ -60,7 +63,8 @@ public class ArticleListController {
         CloseableHttpResponse execute = httpClient.execute(httpGet);
         List<ArticleModel> articleModels = null;
         if (execute.getStatusLine().getStatusCode() == 200) {
-            articleModels = JSON.parseObject(EntityUtils.toString(execute.getEntity())).getJSONObject("data").getJSONArray("rows").toJavaList(ArticleModel.class);
+            JSONArray jsonArray = JSON.parseObject(EntityUtils.toString(execute.getEntity())).getJSONObject("data").getJSONArray("rows");
+            articleModels = jsonArray.stream().map(x -> JSON.parseObject(JSON.toJSONString(x), ArticleModel.class)).collect(Collectors.toList());
         }
         execute.close();
         return articleModels;

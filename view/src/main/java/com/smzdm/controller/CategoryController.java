@@ -1,7 +1,5 @@
 package com.smzdm.controller;
 
-import com.smzdm.model.ResponseResult;
-import com.smzdm.util.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
