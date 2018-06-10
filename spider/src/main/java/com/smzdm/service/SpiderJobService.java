@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
@@ -47,6 +48,8 @@ public class SpiderJobService {
     private JsonConvertService jsonConvertService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private ValueOperations<String, String> valueOperations;
     @Value("${custom.unknown-category}")
     private String unknownCategory;
 
@@ -89,9 +92,9 @@ public class SpiderJobService {
     private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {
         String key = spiderConfig.getRedisKey();
         boolean discovery = spiderConfig.isDiscovery();
-        long timeSort = Long.valueOf(Optional.ofNullable(stringRedisTemplate.opsForValue().get(key)).orElse("0"));
+        long timeSort = Long.valueOf(Optional.ofNullable(valueOperations.get(key)).orElse("0"));
         generateArticleJson(jsonList, discovery, timeSort);
-        stringRedisTemplate.opsForValue().set(key, String.valueOf(generateArticle(jsonList, discovery, timeSort)));
+        valueOperations.set(key, String.valueOf(generateArticle(jsonList, discovery, timeSort)));
     }
 
     private Long generateArticle(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
