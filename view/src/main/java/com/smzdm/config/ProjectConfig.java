@@ -35,7 +35,7 @@ public class ProjectConfig {
     }
 
     @Bean
-    public ValueOperations stringValueOperations() {
+    public ValueOperations<String,String> valueOperations() {
         return stringRedisTemplate.opsForValue();
     }
 

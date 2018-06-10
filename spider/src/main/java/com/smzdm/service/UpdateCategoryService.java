@@ -6,6 +6,7 @@ import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.model.CategoryModel;
 import com.smzdm.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,10 +21,13 @@ import static java.util.stream.Collectors.toList;
 public class UpdateCategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private ValueOperations<String, String> valueOperations;
 
-    public void insert(String json) {
-        List<CategoryModel> list = convertToParallelList(JSON.parseArray(json, CategoryModel.class), new ArrayList<>(2500));
-        List<Category> collect = list.stream().map(x -> {
+    public void insert(String categoryString) {
+        List<CategoryModel> categoryModels = JSON.parseArray(categoryString, CategoryModel.class);
+        List<CategoryModel> parallelList = convertToParallelList(categoryModels, new ArrayList<>(2500));
+        List<Category> collect = parallelList.stream().map(x -> {
             Category category = new Category();
             category.setId(x.getId());
             category.setTitle(x.getTitle());
@@ -36,6 +40,8 @@ public class UpdateCategoryService {
         }).collect(toList());
         categoryMapper.truncateCategory();
         categoryMapper.insertList(collect);
+        valueOperations.set("category:layer", JSON.toJSONString(categoryModels));
+        valueOperations.set("category:parallel", JSON.toJSONString(parallelList));
     }
 
     private List<CategoryModel> convertToParallelList(List<CategoryModel> categories, List<CategoryModel> parallelList) {
