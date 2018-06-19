@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/article")
 public class ArticleListController {
 
-    @Autowired
-    private ArticleMapper articleMapper;
     @Value("${custom.search-url}")
     private String url;
 

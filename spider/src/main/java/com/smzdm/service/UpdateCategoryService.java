@@ -6,11 +6,15 @@ import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.model.CategoryModel;
 import com.smzdm.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -23,6 +27,8 @@ public class UpdateCategoryService {
     private CategoryMapper categoryMapper;
     @Autowired
     private ValueOperations<String, String> valueOperations;
+    @Value("${custom.category-key}")
+    private String categoryKey;
 
     public void insert(String categoryString) {
         List<CategoryModel> categoryModels = JSON.parseArray(categoryString, CategoryModel.class);
@@ -40,8 +46,7 @@ public class UpdateCategoryService {
         }).collect(toList());
         categoryMapper.truncateCategory();
         categoryMapper.insertList(collect);
-        valueOperations.set("category:layer", JSON.toJSONString(categoryModels));
-        valueOperations.set("category:parallel", JSON.toJSONString(parallelList));
+        valueOperations.set(categoryKey, getTopThree(categoryModels));
     }
 
     private List<CategoryModel> convertToParallelList(List<CategoryModel> categories, List<CategoryModel> parallelList) {
@@ -53,5 +58,25 @@ public class UpdateCategoryService {
             }
         });
         return parallelList;
+    }
+
+    private String getTopThree(List<CategoryModel> categoryModels) {
+        categoryModels.forEach(x -> {
+            x.setParentIds(null);
+            List<CategoryModel> secondLayer = x.getChild();
+            if (!CollectionUtils.isEmpty(secondLayer)) {
+                secondLayer.forEach(y -> {
+                    y.setParentIds(null);
+                    List<CategoryModel> thirdLayer = y.getChild();
+                    if (!CollectionUtils.isEmpty(thirdLayer)) {
+                        thirdLayer.forEach(z -> {
+                            z.setChild(null);
+                            z.setParentIds(null);
+                        });
+                    }
+                });
+            }
+        });
+        return JSON.toJSONString(categoryModels);
     }
 }
