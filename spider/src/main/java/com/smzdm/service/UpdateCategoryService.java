@@ -29,6 +29,8 @@ public class UpdateCategoryService {
     private ValueOperations<String, String> valueOperations;
     @Value("${custom.category-key}")
     private String categoryKey;
+    @Autowired
+    private List<Category> categories;
 
     public void insert(String categoryString) {
         List<CategoryModel> categoryModels = JSON.parseArray(categoryString, CategoryModel.class);
@@ -45,6 +47,8 @@ public class UpdateCategoryService {
             return category;
         }).collect(toList());
         categoryMapper.truncateCategory();
+        categories.clear();
+        categories.addAll(collect);
         categoryMapper.insertList(collect);
         valueOperations.set(categoryKey, getTopThree(categoryModels));
     }

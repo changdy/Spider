@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.toList;
 public class SpiderJobService {
 
     @Autowired
-    private Category[] categories;
+    private List<Category> categories;
     @Autowired
     private PageProcessor jsonProcessor;
     @Autowired
@@ -178,10 +178,9 @@ public class SpiderJobService {
     }
 
     private Short checkInArr(String title) {
-        for (Category category : categories) {
-            if (category.getTitle().equals(title)) {
-                return category.getId();
-            }
+        Optional<Category> category = categories.stream().filter(x -> x.getTitle().equals(title)).findFirst();
+        if (category.isPresent()) {
+            return category.get().getId();
         }
         return null;
     }

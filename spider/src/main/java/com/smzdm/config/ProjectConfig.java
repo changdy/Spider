@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @Configuration
 public class ProjectConfig {
 
@@ -15,8 +19,10 @@ public class ProjectConfig {
     private CategoryMapper categoryMapper;
 
     @Bean
-    public Category[] categories() {
-        return categoryMapper.getCategoryArray();
+    public List<Category> categories() {
+        List<Category> categories = Collections.synchronizedList(new ArrayList<Category>());
+        categories.addAll(categoryMapper.getCategoryArray());
+        return categories;
     }
 
     @Bean
