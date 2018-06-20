@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @ControllerAdvice
 public class ExceptionHandle {
@@ -17,14 +19,14 @@ public class ExceptionHandle {
 
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
-    public ResponseResult handle(Exception e) {
+    public ResponseResult handle(Exception e, HttpServletRequest request) {
         if (e instanceof ResponseException) {
             ResponseException exception = (ResponseException) e;
             log.info(e.getMessage());
             return ResultUtil.error(exception.getCode(), exception.getMessage());
         } else {
             log.error("未被捕捉异常:", e);
-            return ResultUtil.error(ResultEnums.UNKNOWN_ERROR.getCode(), ResultEnums.UNKNOWN_ERROR.getMsg() + "[" + e.getClass().getName() + ": " + e.getLocalizedMessage() + "]");
+            return ResultUtil.error(ResultEnums.UNKNOWN_ERROR.getCode(), ResultEnums.UNKNOWN_ERROR.getMsg() + "url:[" + request.getRequestURI() + "][" + e.getClass().getName() + ": " + e.getLocalizedMessage() + "]");
         }
     }
 }

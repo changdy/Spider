@@ -11,6 +11,10 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: rootpwd
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+   add-mappings: false
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-handlers-package: com.smzdm.typehandler

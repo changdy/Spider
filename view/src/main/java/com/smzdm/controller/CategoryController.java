@@ -30,7 +30,7 @@ public class CategoryController {
         } else {
             String[] arr = new String[2];
             arr[0] = s;
-            arr[1] = valueOperations.get("categoryKey");
+            arr[1] = valueOperations.get(categoryKey);
             return ResultUtil.success(arr);
         }
     }
