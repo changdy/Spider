@@ -14,8 +14,4 @@ public class PageModel {
     @NotNull
     private Integer pageSize;
     private Integer offset;
-    //order by 字段
-    private String orderBy;
-    // 表示正反序
-    private Boolean desc;
 }

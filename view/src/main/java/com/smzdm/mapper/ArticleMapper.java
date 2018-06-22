@@ -2,16 +2,14 @@ package com.smzdm.mapper;
 
 
 import com.smzdm.model.ArticleModel;
-import com.smzdm.model.ArticleSearch;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.smzdm.model.DataBaseSearchModel;
 
 import java.util.List;
 
 public interface ArticleMapper extends BaseArticleMapper {
 
-    int getCount(ArticleSearch articleSearch);
+    long getCount(DataBaseSearchModel dataBaseSearchModel);
 
-    List<ArticleModel> queryArticle(ArticleSearch articleSearch);
+    List<ArticleModel> queryArticle(DataBaseSearchModel dataBaseSearchModel);
 
 }

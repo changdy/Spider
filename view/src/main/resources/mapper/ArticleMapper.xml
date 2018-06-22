@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.smzdm.mapper.ArticleMapper">
-    <select id="getCount" resultType="java.lang.Integer">
+    <select id="getCount" resultType="java.lang.Long">
         SELECT count(*) FROM article i, article_info j WHERE i.article_id = j.article_id
-        <if test="isDiscovery!=null ">
-            AND is_discovery =#{isDiscovery}
-        </if>
         <if test="worthy!=null ">
             AND worthy >=#{worthy}
         </if>
-        <if test="category!=null ">
-            AND #{category} @> category
+        <if test="comment!=null ">
+            AND comment >=#{comment}
+        </if>
+        <if test="secondCategory!=null ">
+            AND  category[1] = ANY(#{secondCategory})
+        </if>
+        <if test="thirdCategory!=null ">
+            AND  category[2] = ANY(#{thirdCategory})
         </if>
         <choose>
             <when test="startTime!=null and endTime!=null">
@@ -73,14 +76,17 @@
           j.timeout,
           k.title AS category_title
         FROM article i, article_info j, category_info k  WHERE i.article_id = j.article_id AND category = category_arr
-        <if test="isDiscovery!=null ">
-            AND is_discovery =#{isDiscovery}
-        </if>
         <if test="worthy!=null ">
             AND worthy >=#{worthy}
         </if>
-        <if test="category!=null ">
-            AND #{category} @> category
+        <if test="comment!=null ">
+            AND comment >=#{comment}
+        </if>
+        <if test="secondCategory!=null ">
+            AND  category[1] = ANY(#{secondCategory})
+        </if>
+        <if test="thirdCategory!=null ">
+            AND  category[2] = ANY(#{thirdCategory})
         </if>
         <choose>
             <when test="startTime!=null and endTime!=null">
@@ -97,10 +103,6 @@
         </choose>
         <if test="keyWords!=null and keyWords!=''">
             AND to_tsvector('testzhcfg', i.title) @@ '${keyWords}'
-        </if>
-        ORDER BY #{orderBy}
-        <if test="desc = true ">
-            desc
         </if>
         limit #{pageSize}  OFFSET #{offset}
     </select>

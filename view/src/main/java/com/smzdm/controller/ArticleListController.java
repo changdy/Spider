@@ -3,9 +3,7 @@ package com.smzdm.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.smzdm.mapper.ArticleMapper;
-import com.smzdm.model.ArticleModel;
-import com.smzdm.model.ResponseResult;
-import com.smzdm.model.SearchType;
+import com.smzdm.model.*;
 import com.smzdm.util.ResultUtil;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -37,17 +35,20 @@ public class ArticleListController {
     @Value("${custom.search-url}")
     private String url;
 
+    @Autowired
+    private ArticleMapper articleMapper;
 
-    @PostMapping("proxy-list")
-    public ResponseResult<List<ArticleModel>> getList(@RequestBody SearchType searchType) throws IOException, URISyntaxException {
-        String type = searchType.isSearchByCategory() ? "faxian" : "home";
+
+    @PostMapping("/proxy-list")
+    public ResponseResult<List<ArticleModel>> getList(@RequestBody ApiSearchModel apiSearchModel) throws IOException, URISyntaxException {
+        String type = apiSearchModel.isSearchByCategory() ? "faxian" : "home";
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet();
         httpGet.setHeader("User-Agent", "smzdm_android_V8.7.4 rv:450 (ZUK Z2131;Android8.0.0;zh)smzdmapp");
         httpGet.setHeader("Host", "api.smzdm.com");
         List<ArticleModel> list = new ArrayList<>();
-        for (Integer i = 0; i < searchType.getPage(); i++) {
-            list.addAll(sendRequest(httpClient, MessageFormat.format(url, searchType.getKeyWords(), type, i * 100), httpGet));
+        for (Integer i = 0; i < apiSearchModel.getPage(); i++) {
+            list.addAll(sendRequest(httpClient, MessageFormat.format(url, apiSearchModel.getKeyWords(), type, i * 100), httpGet));
         }
         httpClient.close();
         return ResultUtil.success(list);
@@ -63,5 +64,10 @@ public class ArticleListController {
         }
         execute.close();
         return articleModels;
+    }
+
+    @PostMapping("/search-article")
+    public ResponseResult<SimplePageContent<ArticleModel>> getList(@RequestBody DataBaseSearchModel model) {
+        return ResultUtil.success(new SimplePageContent<>(model.getPageIndex(), articleMapper.getCount(model), articleMapper.queryArticle(model)));
     }
 }
