@@ -68,6 +68,6 @@ public class ArticleListController {
 
     @PostMapping("/search-article")
     public ResponseResult<SimplePageContent<ArticleModel>> getList(@RequestBody DataBaseSearchModel model) {
-        return ResultUtil.success(new SimplePageContent<>(model.getPageIndex(), articleMapper.getCount(model), articleMapper.queryArticle(model)));
+        return ResultUtil.success(new SimplePageContent<>(articleMapper.getCount(model), articleMapper.queryArticle(model)));
     }
 }

@@ -11,7 +11,6 @@ import java.util.List;
  */
 @Data
 public class SimplePageContent<T> {
-    private Integer pageIndex;
     private Long recordSize;
     private List<T> list;
 
@@ -19,13 +18,11 @@ public class SimplePageContent<T> {
 
     }
 
-    public SimplePageContent(Integer pageIndex, Long recordSize) {
-        this.pageIndex = pageIndex;
+    public SimplePageContent(Long recordSize) {
         this.recordSize = recordSize;
     }
 
-    public SimplePageContent(Integer pageIndex, Long recordSize, List<T> list) {
-        this.pageIndex = pageIndex;
+    public SimplePageContent(Long recordSize, List<T> list) {
         this.recordSize = recordSize;
         this.list = list;
     }
