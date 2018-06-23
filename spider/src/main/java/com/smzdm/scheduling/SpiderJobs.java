@@ -24,7 +24,7 @@ import java.time.LocalTime;
 import java.util.Optional;
 
 
-//@Component
+@Component
 public class SpiderJobs {
     @Autowired
     private SpiderJobService spiderJob;
