@@ -80,6 +80,7 @@ public class SpiderJobService {
         }
     }
 
+    // 点赞
     private void generateArticleInfo(List<JSONObject> jsonList) {
         LocalDateTime now = LocalDateTime.now();
         List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
@@ -87,6 +88,7 @@ public class SpiderJobService {
         articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
         articleInfoMapper.insertHistoryList(infoList);
         articleInfoMapper.insertList(infoList);
+
     }
 
     private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {
@@ -172,8 +174,8 @@ public class SpiderJobService {
                     return arr;
                 }
             }
+            stringRedisTemplate.opsForList().rightPush(unknownCategory, categoryStr);
         }
-        stringRedisTemplate.opsForList().rightPush(unknownCategory, categoryStr);
         return null;
     }
 

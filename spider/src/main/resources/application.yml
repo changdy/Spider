@@ -25,3 +25,8 @@ custom:
   turn: home:turn
   unknown-category: unknown:category
   category-key: categoryList
+  sub-prefix: "sub:"
+  access-token-key: saa:access-token
+  openId: oVJJCvx28HDsflYiPF-EwKsYeOJ8
+  url-prefix: "https://www.smzdm.com/p/"
+  notice-url: "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="

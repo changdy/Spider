@@ -2,7 +2,9 @@ package com.smzdm.scheduling;
 
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
+import com.smzdm.mapper.ArticleSubscriptionMapper;
 import com.smzdm.mapper.BaseEnumMapper;
+import com.smzdm.pojo.ArticleSubscription;
 import com.smzdm.service.SpiderJobService;
 import com.smzdm.service.UpdateCategoryService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -40,6 +43,11 @@ public class SpiderJobs {
     private UpdateCategoryService updateCategoryService;
     @Autowired
     private ValueOperations<String, String> valueOperations;
+    @Autowired
+    private List<ArticleSubscription> articleSubscriptions;
+
+    @Autowired
+    private ArticleSubscriptionMapper articleSubscriptionMapper;
 
     @PostConstruct()
     public void initRedis() {
@@ -106,5 +114,11 @@ public class SpiderJobs {
         }
         httpClient.close();
         execute.close();
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    public void updateSubscription() {
+        articleSubscriptions.clear();
+        articleSubscriptions.addAll(articleSubscriptionMapper.selectAll());
     }
 }

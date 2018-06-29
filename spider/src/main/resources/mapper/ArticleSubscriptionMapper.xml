@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smzdm.mapper.ArticleSubscriptionMapper">
+    <resultMap id="BaseResultMap" type="com.smzdm.pojo.ArticleSubscription">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="title_contain" jdbcType="ARRAY" property="titleContain" typeHandler="com.smzdm.typehandler.StringArrayHandler"/>
+        <result column="title_reject" jdbcType="ARRAY" property="titleReject" typeHandler="com.smzdm.typehandler.StringArrayHandler"/>
+        <result column="worth_count" jdbcType="INTEGER" property="worthCount" />
+        <result column="category_contain" jdbcType="ARRAY" property="categoryContain" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
+        <result column="category_reject" jdbcType="ARRAY" property="categoryReject" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT id, name, title_contain, title_reject, worth_count, category_contain, category_reject FROM article_subscription
+    </select>
+</mapper>
