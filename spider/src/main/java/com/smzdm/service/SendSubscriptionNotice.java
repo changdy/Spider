@@ -34,11 +34,12 @@ public class SendSubscriptionNotice {
     private List<ArticleSubscription> articleSubscriptions;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-
     @Value("${custom.sub-prefix}")
     private String subPrefix;
     @Autowired
     private List<Category> categories;
+    @Autowired
+    private SendNoticeService sendNoticeService;
 
     // 检查是否已经 符合规则
     public void checkArticle(List<Article> articles) {
@@ -69,6 +70,7 @@ public class SendSubscriptionNotice {
                     SubNoticeMsg subNoticeMsg = JSON.parseObject(valueOperations.get(key), SubNoticeMsg.class);
                     String appraise = MessageFormat.format("值:{0},不值:{1},评论:{2},收藏", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
                     subNoticeMsg.setAppraise(appraise);
+                    sendNoticeService.sendWxMsg(articleId, subNoticeMsg);
                 }
             });
         });

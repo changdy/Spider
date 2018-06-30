@@ -53,6 +53,9 @@ public class SpiderJobService {
     @Value("${custom.unknown-category}")
     private String unknownCategory;
 
+    @Autowired
+    private SendSubscriptionNotice sendSubscriptionNotice;
+
     private static final Map<String, Short[]> SPECIAL_CATEGORY = new HashMap<>();
 
     //这几个比较奇葩
@@ -88,7 +91,7 @@ public class SpiderJobService {
         articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
         articleInfoMapper.insertHistoryList(infoList);
         articleInfoMapper.insertList(infoList);
-
+        sendSubscriptionNotice.checkInfo(infoList);
     }
 
     private void insertArticle(SpiderConfigEnum spiderConfig, List<JSONObject> jsonList) {
@@ -116,6 +119,7 @@ public class SpiderJobService {
                 articles.forEach(x -> x.setIsDiscovery(false));
             }
             articleMapper.insertList(articles);
+            sendSubscriptionNotice.checkArticle(articles);
         }
         return articles.stream().map(Article::getTimeSort).max(Long::compareTo).orElse(timeSort);
     }
