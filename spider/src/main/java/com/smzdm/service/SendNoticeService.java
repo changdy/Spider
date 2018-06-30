@@ -1,9 +1,7 @@
 package com.smzdm.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.smzdm.model.SubNoticeMsg;
-import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.WxNoticeResult;
 import com.smzdm.util.HttpUtil;
 import com.smzdm.util.WxMsgConvertUtil;
