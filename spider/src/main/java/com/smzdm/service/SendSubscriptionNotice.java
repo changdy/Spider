@@ -7,18 +7,16 @@ import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
 import com.smzdm.pojo.ArticleSubscription;
 import com.smzdm.pojo.Category;
-import org.assertj.core.util.Strings;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Changdy on 2018/6/28.
  */
+@Slf4j
 @Service
 public class SendSubscriptionNotice {
     @Autowired
@@ -65,6 +64,7 @@ public class SendSubscriptionNotice {
     }
 
     // 检查是否 满足点赞条件
+    @Async
     public void checkInfo(List<ArticleInfo> infoList) {
         Set<String> keys = stringRedisTemplate.keys(subPrefix + "*");
         keys.forEach(key -> {
@@ -72,11 +72,11 @@ public class SendSubscriptionNotice {
             int worth = Integer.valueOf(key.split(":")[1].split("-")[1]);
             infoList.forEach(info -> {
                 if (info.getArticleId() == articleId && info.getWorthy() > worth) {
-                    stringRedisTemplate.delete(key);
                     SubNoticeMsg subNoticeMsg = JSON.parseObject(valueOperations.get(key), SubNoticeMsg.class);
-                    String appraise = MessageFormat.format("值:{0},不值:{1},评论:{2},收藏", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
+                    String appraise = MessageFormat.format("值:{0},不值:{1},评论:{2},收藏:{3}", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
                     subNoticeMsg.setAppraise(appraise);
                     sendNoticeService.sendWxMsg(articleId, subNoticeMsg);
+                    stringRedisTemplate.delete(key);
                 }
             });
         });

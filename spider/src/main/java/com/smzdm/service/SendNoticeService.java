@@ -1,6 +1,7 @@
 package com.smzdm.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.smzdm.mapper.WxNoticeResultMapper;
 import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.WxNoticeResult;
 import com.smzdm.util.HttpUtil;
@@ -26,6 +27,8 @@ public class SendNoticeService {
     private String urlPrefix;
     @Value("${custom.notice-url}")
     private String noticeUrl;
+    @Autowired
+    private WxNoticeResultMapper wxNoticeResultMapper;
 
     @Autowired
     private ValueOperations<String, String> valueOperations;
@@ -43,6 +46,7 @@ public class SendNoticeService {
             wxNoticeResult.setResponse(response.toJSONString());
             wxNoticeResult.setSendMsg(requestBody);
             wxNoticeResult.setSuccess(flag);
+            wxNoticeResultMapper.insert(wxNoticeResult);
         } catch (IOException e) {
             log.error("发送失败", e);
             e.printStackTrace();
@@ -52,7 +56,7 @@ public class SendNoticeService {
 
     private class WxNoticeTemplate {
         public String touser = "oVJJCvx28HDsflYiPF-EwKsYeOJ8";
-        public String template_id = "Az1xsobT6jQvc3TOl25ekpNuRPGHdu5pMjgBXRYLlrk";
+        public String template_id = "fuaaUQYgNXWzX8ffT0Sz28u08f2h1Qx9aDbe-ciHazg";
         public String url;
         public Object data;
     }
