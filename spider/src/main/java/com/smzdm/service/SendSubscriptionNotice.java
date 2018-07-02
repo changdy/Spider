@@ -67,6 +67,7 @@ public class SendSubscriptionNotice {
             int worth = Integer.valueOf(key.split(":")[1].split("-")[1]);
             infoList.forEach(info -> {
                 if (info.getArticleId() == articleId && info.getWorthy() > worth) {
+                    stringRedisTemplate.delete(key);
                     SubNoticeMsg subNoticeMsg = JSON.parseObject(valueOperations.get(key), SubNoticeMsg.class);
                     String appraise = MessageFormat.format("值:{0},不值:{1},评论:{2},收藏", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
                     subNoticeMsg.setAppraise(appraise);
