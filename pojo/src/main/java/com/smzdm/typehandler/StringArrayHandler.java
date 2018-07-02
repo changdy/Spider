@@ -18,22 +18,25 @@ public class StringArrayHandler extends BaseTypeHandler<String[]> {
 
     @Override
     public String[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return convertToArray(rs.getString(columnName));
+        return convertToArray(rs.getArray(columnName));
     }
 
     @Override
     public String[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return convertToArray(rs.getString(columnIndex));
+        return convertToArray(rs.getArray(columnIndex));
     }
 
     @Override
     public String[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return convertToArray(cs.getString(columnIndex));
+        return convertToArray(cs.getArray(columnIndex));
     }
 
-    private String[] convertToArray(String value) {
-        if (value != null) {
-            return value.split(",");
+    private String[] convertToArray(Array array) throws SQLException {
+        if (array != null) {
+            Object objectArr = array.getArray();
+            if (objectArr instanceof String[]) {
+                return (String[]) objectArr;
+            }
         }
         return null;
     }
