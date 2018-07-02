@@ -1,6 +1,7 @@
 package com.smzdm.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
@@ -58,7 +59,7 @@ public class SendSubscriptionNotice {
                 } else {
                     subNoticeMsg.setCategory("");
                 }
-                valueOperations.set(subPrefix + article.getArticleId() + "-" + subscription.getWorthCount(), String.valueOf(subscription.getWorthCount()), 6, TimeUnit.HOURS);
+                valueOperations.set(subPrefix + article.getArticleId() + "-" + subscription.getWorthCount(), JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
             }
         }));
     }
