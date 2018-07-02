@@ -49,11 +49,15 @@ public class SendSubscriptionNotice {
                 subNoticeMsg.setMall(article.getMall());
                 subNoticeMsg.setPrice(article.getPrice());
                 subNoticeMsg.setTitle(article.getTitle());
-                List<String> category = new ArrayList<>();
-                for (short categoryId : article.getCategory()) {
-                    categories.stream().filter(x -> x.getId() == categoryId).findFirst().map(Category::getTitle).ifPresent(category::add);
+                if (article.getCategory() != null) {
+                    List<String> category = new ArrayList<>();
+                    for (short categoryId : article.getCategory()) {
+                        categories.stream().filter(x -> x.getId() == categoryId).findFirst().map(Category::getTitle).ifPresent(category::add);
+                    }
+                    subNoticeMsg.setCategory(String.join(",", category));
+                } else {
+                    subNoticeMsg.setCategory("");
                 }
-                subNoticeMsg.setCategory(String.join(",", category));
                 valueOperations.set(subPrefix + article.getArticleId() + "-" + subscription.getWorthCount(), String.valueOf(subscription.getWorthCount()), 6, TimeUnit.HOURS);
             }
         }));
