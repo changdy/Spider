@@ -43,11 +43,6 @@ public class SpiderJobs {
     private UpdateCategoryService updateCategoryService;
     @Autowired
     private ValueOperations<String, String> valueOperations;
-    @Autowired
-    private List<ArticleSubscription> articleSubscriptions;
-
-    @Autowired
-    private ArticleSubscriptionMapper articleSubscriptionMapper;
 
     @PostConstruct()
     public void initRedis() {
@@ -114,11 +109,5 @@ public class SpiderJobs {
         }
         httpClient.close();
         execute.close();
-    }
-
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    public void updateSubscription() {
-        articleSubscriptions.clear();
-        articleSubscriptions.addAll(articleSubscriptionMapper.selectAll());
     }
 }

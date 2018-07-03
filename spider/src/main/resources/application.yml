@@ -3,8 +3,6 @@ server:
 spring:
   redis:
     database: 0
-    host: 192.168.2.233
-    password: redispwd
     port: 6379
   datasource:
     url: jdbc:postgresql://192.168.2.233:5432/smzdm
@@ -30,3 +28,5 @@ custom:
   openId: oVJJCvx28HDsflYiPF-EwKsYeOJ8
   url-prefix: "https://www.smzdm.com/p/"
   notice-url: "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="
+  ip-url: "https://api.ip.sb/ip"
+  ip-key: home-ip
