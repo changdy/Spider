@@ -30,3 +30,10 @@ custom:
   notice-url: "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="
   ip-url: "https://api.ip.sb/ip"
   ip-key: home-ip
+redis-config:
+  expired-topic: __keyevent@0__:expired
+  core-pool-size: 10
+  max-pool-size: 20
+  queue-capacity: 100
+  keep-alive-seconds: 60
+  thread-name-prefix: redis
