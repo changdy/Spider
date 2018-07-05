@@ -18,6 +18,8 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-handlers-package: com.smzdm.typehandler
+  configuration:
+    map-underscore-to-camel-case: true
 logging:
   level:
     root: info

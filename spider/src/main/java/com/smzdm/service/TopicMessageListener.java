@@ -2,6 +2,7 @@ package com.smzdm.service;
 
 import com.smzdm.config.ProjectConfig;
 import com.smzdm.mapper.ArticleMapper;
+import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.ArticleInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +22,29 @@ public class TopicMessageListener implements MessageListener {
 
     @Autowired
     private PageProcessor htmlProcessor;
-
     @Autowired
     private ProjectConfig projectConfig;
+    @Autowired
+    private SendSubscriptionNotice sendSubscriptionNotice;
+    @Autowired
+    private SendNoticeService sendNoticeService;
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {// 客户端监听订阅的topic，当有消息的时候，会触发该方法
+    public void onMessage(Message message, byte[] pattern) {
         // sub:9958301-30
         String key = new String(message.getBody());
         if (key.startsWith("sub:")) {
-            String[] split = key.replace("sub:", "").split("-");
+            String[] split = key.replaceFirst("sub:", "").split("-");
             Integer articleId = Integer.valueOf(split[0]);
-            Integer worth = Integer.valueOf(split[1]);
+            Short worth = Short.valueOf(split[1]);
             Spider spider = Spider.create(htmlProcessor);
             ResultItems resultItems = spider.get(projectConfig.getArticleUrl() + articleId);
             ArticleInfo info = resultItems.get("ArticleInfo");
+            if (info.getWorthy() > worth) {
+                SubNoticeMsg subNoticeMsg = sendSubscriptionNotice.generateSubNoticeMsg(articleMapper.getMainInfo(articleId));
+                subNoticeMsg.setAppraise(sendSubscriptionNotice.generateAppraise(info));
+                sendNoticeService.sendWxMsg(articleId, subNoticeMsg);
+            }
             spider.close();
         }
     }

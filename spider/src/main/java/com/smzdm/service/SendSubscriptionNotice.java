@@ -45,20 +45,9 @@ public class SendSubscriptionNotice {
     public void checkArticle(List<Article> articles) {
         articleSubscriptions.forEach(subscription -> articles.forEach(article -> {
             if (check(article, subscription)) {
-                SubNoticeMsg subNoticeMsg = new SubNoticeMsg();
-                subNoticeMsg.setMall(article.getMall());
-                subNoticeMsg.setPrice(article.getPrice());
-                subNoticeMsg.setTitle(article.getTitle());
-                if (article.getCategory() != null) {
-                    List<String> category = new ArrayList<>();
-                    for (short categoryId : article.getCategory()) {
-                        categories.stream().filter(x -> x.getId() == categoryId).findFirst().map(Category::getTitle).ifPresent(category::add);
-                    }
-                    subNoticeMsg.setCategory(String.join(",", category));
-                } else {
-                    subNoticeMsg.setCategory("");
-                }
-                valueOperations.set(projectConfig.getSubPrefix() + article.getArticleId() + "-" + subscription.getWorthCount(), JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
+                SubNoticeMsg subNoticeMsg = generateSubNoticeMsg(article);
+                String key = projectConfig.getSubPrefix() + article.getArticleId() + "-" + subscription.getWorthCount();
+                valueOperations.set(key, JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
             }
         }));
     }
@@ -73,8 +62,7 @@ public class SendSubscriptionNotice {
             infoList.forEach(info -> {
                 if (info.getArticleId() == articleId && info.getWorthy() > worth) {
                     SubNoticeMsg subNoticeMsg = JSON.parseObject(valueOperations.get(key), SubNoticeMsg.class);
-                    String appraise = MessageFormat.format("值:{0},不值:{1},评论:{2},收藏:{3}", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
-                    subNoticeMsg.setAppraise(appraise);
+                    subNoticeMsg.setAppraise(generateAppraise(info));
                     sendNoticeService.sendWxMsg(articleId, subNoticeMsg);
                     stringRedisTemplate.delete(key);
                 }
@@ -120,5 +108,27 @@ public class SendSubscriptionNotice {
             return false;
         }
         return true;
+    }
+
+
+    public SubNoticeMsg generateSubNoticeMsg(Article article) {
+        SubNoticeMsg subNoticeMsg = new SubNoticeMsg();
+        subNoticeMsg.setMall(article.getMall());
+        subNoticeMsg.setPrice(article.getPrice());
+        subNoticeMsg.setTitle(article.getTitle());
+        if (article.getCategory() != null) {
+            List<String> category = new ArrayList<>();
+            for (short categoryId : article.getCategory()) {
+                categories.stream().filter(x -> x.getId() == categoryId).findFirst().map(Category::getTitle).ifPresent(category::add);
+            }
+            subNoticeMsg.setCategory(String.join(",", category));
+        } else {
+            subNoticeMsg.setCategory("");
+        }
+        return subNoticeMsg;
+    }
+
+    public String generateAppraise(ArticleInfo info) {
+        return MessageFormat.format("值:{0},不值:{1},评论:{2},收藏:{3}", info.getWorthy(), info.getUnworthy(), info.getComment(), info.getCollection());
     }
 }
