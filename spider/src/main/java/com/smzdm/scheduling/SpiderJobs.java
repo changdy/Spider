@@ -1,10 +1,9 @@
 package com.smzdm.scheduling;
 
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
-import com.smzdm.mapper.ArticleSubscriptionMapper;
 import com.smzdm.mapper.BaseEnumMapper;
-import com.smzdm.pojo.ArticleSubscription;
 import com.smzdm.service.SpiderJobService;
 import com.smzdm.service.UpdateCategoryService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -14,7 +13,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -35,10 +32,8 @@ public class SpiderJobs {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private BaseEnumMapper baseEnumMapper;
-    @Value("${custom.turn}")
-    private String turn;
-    @Value("${custom.category-key}")
-    private String categoryKey;
+    @Autowired
+    private ProjectConfig projectConfig;
     @Autowired
     private UpdateCategoryService updateCategoryService;
     @Autowired
@@ -59,9 +54,9 @@ public class SpiderJobs {
         LocalTime now = LocalTime.now();
         //6点前要没必要那么频繁
         if (now.getHour() < 7) {
-            Integer integer = Integer.valueOf(Optional.ofNullable(valueOperations.get(turn)).orElse("0"));
+            Integer integer = Integer.valueOf(Optional.ofNullable(valueOperations.get(projectConfig.getTurn())).orElse("0"));
             int remainder = integer % 4;
-            valueOperations.set(turn, String.valueOf(remainder + 1));
+            valueOperations.set(projectConfig.getTurn(), String.valueOf(remainder + 1));
             if (remainder != 0) {
                 return;
             }

@@ -1,5 +1,6 @@
 package com.smzdm.scheduling;
 
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.mapper.ArticleSubscriptionMapper;
 import com.smzdm.pojo.ArticleSubscription;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -8,7 +9,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,10 +28,8 @@ public class OtherTask {
     @Autowired
     private ArticleSubscriptionMapper articleSubscriptionMapper;
 
-    @Value("${custom.ip-url}")
-    private String ipUrl;
-    @Value("${custom.ip-key}")
-    private String ipKey;
+    @Autowired
+    private ProjectConfig projectConfig;
 
     @Autowired
     private ValueOperations<String, String> valueOperations;
@@ -46,14 +44,12 @@ public class OtherTask {
     @Scheduled(fixedDelay = 1000 * 60 * 15)
     public void updateIpAddress() throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(ipUrl);
+        HttpGet httpGet = new HttpGet(projectConfig.getIpUrl());
         CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
-            valueOperations.set(ipKey, EntityUtils.toString(httpResponse.getEntity()));
+            valueOperations.set(projectConfig.getIpKey(), EntityUtils.toString(httpResponse.getEntity()));
         }
         httpResponse.close();
         httpClient.close();
     }
-
-
 }

@@ -2,6 +2,7 @@ package com.smzdm.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.Article;
 import com.smzdm.pojo.ArticleInfo;
@@ -9,7 +10,6 @@ import com.smzdm.pojo.ArticleSubscription;
 import com.smzdm.pojo.Category;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
@@ -34,8 +34,8 @@ public class SendSubscriptionNotice {
     private List<ArticleSubscription> articleSubscriptions;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Value("${custom.sub-prefix}")
-    private String subPrefix;
+    @Autowired
+    private ProjectConfig projectConfig;
     @Autowired
     private List<Category> categories;
     @Autowired
@@ -58,7 +58,7 @@ public class SendSubscriptionNotice {
                 } else {
                     subNoticeMsg.setCategory("");
                 }
-                valueOperations.set(subPrefix + article.getArticleId() + "-" + subscription.getWorthCount(), JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
+                valueOperations.set(projectConfig.getSubPrefix() + article.getArticleId() + "-" + subscription.getWorthCount(), JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
             }
         }));
     }
@@ -66,7 +66,7 @@ public class SendSubscriptionNotice {
     // 检查是否 满足点赞条件
     @Async
     public void checkInfo(List<ArticleInfo> infoList) {
-        Set<String> keys = stringRedisTemplate.keys(subPrefix + "*");
+        Set<String> keys = stringRedisTemplate.keys(projectConfig.getSubPrefix() + "*");
         keys.forEach(key -> {
             int articleId = Integer.valueOf(key.split(":")[1].split("-")[0]);
             int worth = Integer.valueOf(key.split(":")[1].split("-")[1]);

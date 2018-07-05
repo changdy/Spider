@@ -9,7 +9,7 @@ import us.codecraft.webmagic.selector.Html;
 
 import java.time.LocalDateTime;
 
-@Service("htmlProcessor")
+@Service
 public class HtmlProcessor implements PageProcessor {
 
     private static final Site SITE = Site.me().setRetryTimes(5).setSleepTime(1500).setUseGzip(true).setRetrySleepTime(5000);

@@ -1,6 +1,7 @@
 package com.smzdm.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.mapper.WxNoticeResultMapper;
 import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.WxNoticeResult;
@@ -8,7 +9,6 @@ import com.smzdm.util.HttpUtil;
 import com.smzdm.util.WxMsgConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +21,8 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 public class SendNoticeService {
-    @Value("${custom.access-token-key}")
-    private String redisToken;
-    @Value("${custom.url-prefix}")
-    private String urlPrefix;
-    @Value("${custom.notice-url}")
-    private String noticeUrl;
+    @Autowired
+    private ProjectConfig projectConfig;
     @Autowired
     private WxNoticeResultMapper wxNoticeResultMapper;
 
@@ -35,11 +31,11 @@ public class SendNoticeService {
 
     public void sendWxMsg(Integer articleId, SubNoticeMsg subNoticeMsg) {
         WxNoticeTemplate wxNoticeTemplate = new WxNoticeTemplate();
-        wxNoticeTemplate.url = urlPrefix + articleId;
+        wxNoticeTemplate.url = projectConfig.getUrlPrefix() + articleId;
         wxNoticeTemplate.data = WxMsgConvertUtil.objectConvert(subNoticeMsg);
         try {
             String requestBody = JSONObject.toJSONString(wxNoticeTemplate);
-            JSONObject response = HttpUtil.sendJSONPost(requestBody, noticeUrl + valueOperations.get(redisToken));
+            JSONObject response = HttpUtil.sendJSONPost(requestBody, projectConfig.getNoticeUrl() + valueOperations.get(projectConfig.getAccessTokenKey()));
             boolean flag = response.getInteger("errcode") == 0;
             WxNoticeResult wxNoticeResult = new WxNoticeResult();
             wxNoticeResult.setEventTime(LocalDateTime.now());

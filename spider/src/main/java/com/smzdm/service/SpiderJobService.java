@@ -2,6 +2,7 @@ package com.smzdm.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.enums.SpiderConfigEnum;
 import com.smzdm.enums.TypeRelationEnum;
 import com.smzdm.mapper.ArticleInfoMapper;
@@ -14,7 +15,6 @@ import com.smzdm.pojo.ArticleJson;
 import com.smzdm.pojo.Category;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -50,8 +50,8 @@ public class SpiderJobService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private ValueOperations<String, String> valueOperations;
-    @Value("${custom.unknown-category}")
-    private String unknownCategory;
+    @Autowired
+    private ProjectConfig projectConfig;
 
     @Autowired
     private SendSubscriptionNotice sendSubscriptionNotice;
@@ -178,7 +178,7 @@ public class SpiderJobService {
                     return arr;
                 }
             }
-            stringRedisTemplate.opsForList().rightPush(unknownCategory, categoryStr);
+            stringRedisTemplate.opsForList().rightPush(projectConfig.getUnknownCategory(), categoryStr);
         }
         return null;
     }

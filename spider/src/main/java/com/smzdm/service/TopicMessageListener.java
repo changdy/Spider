@@ -1,22 +1,42 @@
 package com.smzdm.service;
 
+import com.smzdm.config.ProjectConfig;
+import com.smzdm.mapper.ArticleMapper;
+import com.smzdm.pojo.ArticleInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
+import us.codecraft.webmagic.ResultItems;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.processor.PageProcessor;
 
 @Slf4j
 @Component
 public class TopicMessageListener implements MessageListener {
 
+    @Autowired
+    private ArticleMapper articleMapper;
+
+    @Autowired
+    private PageProcessor htmlProcessor;
+
+    @Autowired
+    private ProjectConfig projectConfig;
+
     @Override
     public void onMessage(Message message, byte[] pattern) {// 客户端监听订阅的topic，当有消息的时候，会触发该方法
-        byte[] body = message.getBody();// 请使用valueSerializer
-        byte[] channel = message.getChannel();
-        String topic = new String(channel);
-        String itemValue = new String(body);
-        // 请参考配置文件，本例中key，value的序列化方式均为string。
-        log.info("topic:" + topic);
-        log.info("itemValue:" + itemValue);
+        // sub:9958301-30
+        String key = new String(message.getBody());
+        if (key.startsWith("sub:")) {
+            String[] split = key.replace("sub:", "").split("-");
+            Integer articleId = Integer.valueOf(split[0]);
+            Integer worth = Integer.valueOf(split[1]);
+            Spider spider = Spider.create(htmlProcessor);
+            ResultItems resultItems = spider.get(projectConfig.getArticleUrl() + articleId);
+            ArticleInfo info = resultItems.get("ArticleInfo");
+            spider.close();
+        }
     }
 }

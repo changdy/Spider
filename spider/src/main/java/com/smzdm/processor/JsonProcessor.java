@@ -11,7 +11,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 /**
  * Created by Changdy on 2017/8/18.
  */
-@Service("jsonProcessor")
+@Service
 public class JsonProcessor implements PageProcessor {
     private static final Site SITE = Site.me().setRetryTimes(5).setSleepTime(1500).setUseGzip(true).setRetrySleepTime(5000);
 

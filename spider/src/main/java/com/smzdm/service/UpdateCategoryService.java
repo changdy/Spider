@@ -2,19 +2,17 @@ package com.smzdm.service;
 
 import com.alibaba.fastjson.JSON;
 import com.smzdm.HandlerFunction;
+import com.smzdm.config.ProjectConfig;
 import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.model.CategoryModel;
 import com.smzdm.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -27,8 +25,8 @@ public class UpdateCategoryService {
     private CategoryMapper categoryMapper;
     @Autowired
     private ValueOperations<String, String> valueOperations;
-    @Value("${custom.category-key}")
-    private String categoryKey;
+    @Autowired
+    private ProjectConfig projectConfig;
     @Autowired
     private List<Category> categories;
 
@@ -50,7 +48,7 @@ public class UpdateCategoryService {
         categories.clear();
         categories.addAll(collect);
         categoryMapper.insertList(collect);
-        valueOperations.set(categoryKey, getTopThree(categoryModels));
+        valueOperations.set(projectConfig.getCategoryKey(), getTopThree(categoryModels));
     }
 
     private List<CategoryModel> convertToParallelList(List<CategoryModel> categories, List<CategoryModel> parallelList) {

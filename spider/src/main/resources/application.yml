@@ -12,6 +12,8 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-handlers-package: com.smzdm.typehandler
+  configuration:
+    map-underscore-to-camel-case: true
 logging:
   level:
     root: info
@@ -19,7 +21,7 @@ logging:
     com.smzdm: debug
   path: /home/logs/spider/
   file: spider.log
-custom:
+project-config:
   turn: home:turn
   unknown-category: unknown:category
   category-key: categoryList
@@ -30,10 +32,5 @@ custom:
   notice-url: "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="
   ip-url: "https://api.ip.sb/ip"
   ip-key: home-ip
-redis-config:
+  article-url: "https://www.smzdm.com/p/"
   expired-topic: __keyevent@0__:expired
-  core-pool-size: 10
-  max-pool-size: 20
-  queue-capacity: 100
-  keep-alive-seconds: 60
-  thread-name-prefix: redis
