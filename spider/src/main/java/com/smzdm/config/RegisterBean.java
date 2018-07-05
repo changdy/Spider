@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
-public class ProjectConfig {
+public class RegisterBean {
 
     @Autowired
     private CategoryMapper categoryMapper;
