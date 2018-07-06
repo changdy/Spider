@@ -180,7 +180,7 @@ public class SpiderJobService {
             }
             stringRedisTemplate.opsForList().rightPush(projectConfig.getUnknownCategory(), categoryStr);
         }
-        return null;
+        return new Short[]{};
     }
 
     private Short checkInArr(String title) {
