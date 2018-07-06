@@ -20,7 +20,6 @@ public class TopicMessageListener implements MessageListener {
 
     @Autowired
     private ArticleMapper articleMapper;
-
     @Autowired
     private PageProcessor htmlProcessor;
     @Autowired
