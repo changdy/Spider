@@ -1,5 +1,6 @@
 package com.smzdm.service;
 
+import com.alibaba.fastjson.JSON;
 import com.smzdm.config.ProjectConfig;
 import com.smzdm.mapper.ArticleMapper;
 import com.smzdm.model.SubNoticeMsg;
@@ -31,8 +32,8 @@ public class TopicMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        // sub:9958301-30
         String key = new String(message.getBody());
+        log.info("{}过期", key);
         if (key.startsWith("sub:")) {
             String[] split = key.replaceFirst("sub:", "").split("-");
             Integer articleId = Integer.valueOf(split[0]);
@@ -40,6 +41,7 @@ public class TopicMessageListener implements MessageListener {
             Spider spider = Spider.create(htmlProcessor);
             ResultItems resultItems = spider.get(projectConfig.getArticleUrl() + articleId);
             ArticleInfo info = resultItems.get("ArticleInfo");
+            log.info("最新点赞情况如{}", JSON.toJSONString(info));
             if (info.getWorthy() > worth) {
                 SubNoticeMsg subNoticeMsg = sendSubscriptionNotice.generateSubNoticeMsg(articleMapper.getMainInfo(articleId));
                 subNoticeMsg.setAppraise(sendSubscriptionNotice.generateAppraise(info));
