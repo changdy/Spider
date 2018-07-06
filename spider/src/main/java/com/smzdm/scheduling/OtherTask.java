@@ -24,18 +24,15 @@ public class OtherTask {
 
     @Autowired
     private List<ArticleSubscription> articleSubscriptions;
-
     @Autowired
     private ArticleSubscriptionMapper articleSubscriptionMapper;
-
     @Autowired
     private ProjectConfig projectConfig;
-
     @Autowired
     private ValueOperations<String, String> valueOperations;
 
 
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60)
     public void updateSubscription() {
         articleSubscriptions.clear();
         articleSubscriptions.addAll(articleSubscriptionMapper.selectAll());

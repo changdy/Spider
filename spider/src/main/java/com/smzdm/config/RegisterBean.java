@@ -7,11 +7,8 @@ import com.smzdm.service.TopicMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +20,7 @@ public class RegisterBean {
     @Autowired
     private CategoryMapper categoryMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
-    private TopicMessageListener messageListener;
-    @Autowired
-    private ProjectConfig projectConfig;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Bean
     public List<Category> categories() {
@@ -42,16 +35,7 @@ public class RegisterBean {
     }
 
     @Bean
-    public ValueOperations<String, String> valueOperations(StringRedisTemplate stringRedisTemplate) {
+    public ValueOperations<String, String> valueOperations() {
         return stringRedisTemplate.opsForValue();
-    }
-
-    @Bean
-    public RedisMessageListenerContainer configRedisMessageListenerContainer() {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisTemplate.getConnectionFactory());
-        ChannelTopic channelTopic = new ChannelTopic(projectConfig.getExpiredTopic());
-        container.addMessageListener(messageListener, channelTopic);
-        return container;
     }
 }

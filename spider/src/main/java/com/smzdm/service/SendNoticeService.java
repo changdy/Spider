@@ -25,7 +25,6 @@ public class SendNoticeService {
     private ProjectConfig projectConfig;
     @Autowired
     private WxNoticeResultMapper wxNoticeResultMapper;
-
     @Autowired
     private ValueOperations<String, String> valueOperations;
 
