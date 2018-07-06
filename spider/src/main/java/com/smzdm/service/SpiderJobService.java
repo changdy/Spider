@@ -116,7 +116,12 @@ public class SpiderJobService {
                     article.setCategory(getCategoryID(article.getCategoryStr()));
                 }
             } else {
-                articles.forEach(x -> x.setIsDiscovery(false));
+                articles.forEach(x -> {
+                    x.setIsDiscovery(false);
+                    if (x.getCategory() == null) {
+                        x.setCategory(new Short[]{});
+                    }
+                });
             }
             articleMapper.insertList(articles);
             sendSubscriptionNotice.checkArticle(articles);
