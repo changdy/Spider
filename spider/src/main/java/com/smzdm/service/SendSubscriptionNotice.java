@@ -47,7 +47,7 @@ public class SendSubscriptionNotice {
             if (check(article, subscription)) {
                 SubNoticeMsg subNoticeMsg = generateSubNoticeMsg(article);
                 String key = projectConfig.getSubPrefix() + article.getArticleId() + "-" + subscription.getWorthCount();
-                valueOperations.set(key, JSONObject.toJSONString(subNoticeMsg), 6, TimeUnit.HOURS);
+                valueOperations.set(key, JSONObject.toJSONString(subNoticeMsg), subscription.getTimeout(), TimeUnit.MINUTES);
             }
         }));
     }

@@ -14,4 +14,5 @@ public class ArticleSubscription {
     private Integer worthCount;
     private Short[] categoryContain;
     private Short[] categoryReject;
+    private Integer timeout;
 }

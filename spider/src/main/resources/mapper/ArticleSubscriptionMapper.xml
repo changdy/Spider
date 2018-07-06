@@ -9,8 +9,9 @@
         <result column="worth_count" jdbcType="INTEGER" property="worthCount" />
         <result column="category_contain" jdbcType="ARRAY" property="categoryContain" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
         <result column="category_reject" jdbcType="ARRAY" property="categoryReject" typeHandler="com.smzdm.typehandler.ShortArrayHandler"/>
+        <result column="timeout" jdbcType="INTEGER" property="timeout" />
     </resultMap>
     <select id="selectAll" resultMap="BaseResultMap">
-        SELECT id, name, title_contain, title_reject, worth_count, category_contain, category_reject FROM article_subscription
+        SELECT id, name, title_contain, title_reject, worth_count, category_contain, category_reject,timeout FROM article_subscription
     </select>
 </mapper>
