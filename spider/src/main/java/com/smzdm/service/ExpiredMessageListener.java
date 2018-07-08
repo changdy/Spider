@@ -7,6 +7,7 @@ import com.smzdm.model.SubNoticeMsg;
 import com.smzdm.pojo.ArticleInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 
 @Slf4j
 @Component
-public class TopicMessageListener implements MessageListener {
+public class ExpiredMessageListener implements MessageListener {
 
     @Autowired
     private ArticleMapper articleMapper;
@@ -25,8 +26,10 @@ public class TopicMessageListener implements MessageListener {
     @Autowired
     private ProjectConfig projectConfig;
     @Autowired
+    @Lazy
     private SendSubscriptionNotice sendSubscriptionNotice;
     @Autowired
+    @Lazy
     private SendNoticeService sendNoticeService;
 
     @Override

@@ -3,12 +3,14 @@ package com.smzdm.config;
 import com.smzdm.mapper.CategoryMapper;
 import com.smzdm.pojo.ArticleSubscription;
 import com.smzdm.pojo.Category;
-import com.smzdm.service.TopicMessageListener;
+import com.smzdm.service.ExpiredMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,5 +39,19 @@ public class RegisterBean {
     @Bean
     public ValueOperations<String, String> valueOperations() {
         return stringRedisTemplate.opsForValue();
+    }
+
+    @Autowired
+    private ProjectConfig projectConfig;
+    @Autowired
+    private ExpiredMessageListener expiredMessageListener;
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer() {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(stringRedisTemplate.getConnectionFactory());
+        ChannelTopic channelTopic = new ChannelTopic(projectConfig.getExpiredTopic());
+        container.addMessageListener(expiredMessageListener, channelTopic);
+        return container;
     }
 }

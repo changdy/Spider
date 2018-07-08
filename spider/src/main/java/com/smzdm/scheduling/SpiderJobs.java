@@ -2,8 +2,6 @@ package com.smzdm.scheduling;
 
 import com.smzdm.config.ProjectConfig;
 import com.smzdm.enums.SpiderConfigEnum;
-import com.smzdm.enums.TypeRelationEnum;
-import com.smzdm.mapper.BaseEnumMapper;
 import com.smzdm.service.SpiderJobService;
 import com.smzdm.service.UpdateCategoryService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,12 +11,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Optional;
@@ -29,25 +25,11 @@ public class SpiderJobs {
     @Autowired
     private SpiderJobService spiderJob;
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private BaseEnumMapper baseEnumMapper;
-    @Autowired
     private ProjectConfig projectConfig;
     @Autowired
     private UpdateCategoryService updateCategoryService;
     @Autowired
     private ValueOperations<String, String> valueOperations;
-
-    @PostConstruct()
-    public void initRedis() {
-        TypeRelationEnum[] enums = TypeRelationEnum.values();
-        for (TypeRelationEnum value : enums) {
-            String[] values = baseEnumMapper.getEnum(value.getKey().split(":")[1]);
-            stringRedisTemplate.delete(value.getKey());
-            stringRedisTemplate.opsForSet().add(value.getKey(), values);
-        }
-    }
 
     @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 6 * 1000)
     public void homePageSpider() {

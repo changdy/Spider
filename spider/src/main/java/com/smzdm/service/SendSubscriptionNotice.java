@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class SendSubscriptionNotice {
     @Autowired
     private ValueOperations<String, String> valueOperations;
-
     @Autowired
     private List<ArticleSubscription> articleSubscriptions;
     @Autowired
