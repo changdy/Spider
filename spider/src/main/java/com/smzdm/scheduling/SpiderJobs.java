@@ -2,6 +2,7 @@ package com.smzdm.scheduling;
 
 import com.smzdm.config.ProjectConfig;
 import com.smzdm.enums.SpiderConfigEnum;
+import com.smzdm.service.LinuxCondition;
 import com.smzdm.service.SpiderJobService;
 import com.smzdm.service.UpdateCategoryService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -11,16 +12,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Optional;
 
 
 @Component
+@Conditional(LinuxCondition.class)
 public class SpiderJobs {
     @Autowired
     private SpiderJobService spiderJob;
