@@ -59,8 +59,8 @@ public enum HandlerFunction {
         return ids;
     }),
     SHORT(x -> {
-        if (x.contains("K")) {
-            float value = Float.valueOf(x.replaceAll("K", ""));
+        if (x.contains("K") || x.contains("k")) {
+            float value = Float.valueOf(x.replaceAll("k", "").replaceAll("K", ""));
             Float v = value * 1000;
             return v.shortValue();
         } else {
