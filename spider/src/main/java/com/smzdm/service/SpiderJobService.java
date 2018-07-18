@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -88,7 +89,10 @@ public class SpiderJobService {
         LocalDateTime now = LocalDateTime.now();
         List<ArticleInfo> infoList = jsonList.stream().map(jsonConvertService::convertToInfo).filter(Objects::nonNull).collect(toList());
         infoList.forEach(x -> x.setUpdateTime(now));
-        articleInfoMapper.deleteByIDArticleIDs(infoList.stream().map(ArticleInfo::getArticleId).collect(toList()));
+        List<Integer> ids = infoList.stream().map(ArticleInfo::getArticleId).collect(toList());
+        if (!CollectionUtils.isEmpty(ids)) {
+            articleInfoMapper.deleteByIDArticleIDs(ids);
+        }
         articleInfoMapper.insertHistoryList(infoList);
         articleInfoMapper.insertList(infoList);
         sendSubscriptionNotice.checkInfo(infoList);
