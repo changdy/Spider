@@ -76,7 +76,7 @@ public class JsonConvertService {
     private <T> T handlerConvertException(JSONObject json, Class<T> test) {
         try {
             return convert(json, test);
-        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -89,9 +89,5 @@ public class JsonConvertService {
 
     public ArticleInfo convertToInfo(JSONObject json) {
         return handlerConvertException(json, ArticleInfo.class);
-    }
-
-    public Category convertToCategory(JSONObject json) {
-        return handlerConvertException(json, Category.class);
     }
 }

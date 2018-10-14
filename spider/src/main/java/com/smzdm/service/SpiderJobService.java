@@ -107,7 +107,7 @@ public class SpiderJobService {
     }
 
     private Long generateArticle(List<JSONObject> jsonList, boolean discovery, Long timeSort) {
-        List<Article> articles = jsonList.stream().filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).collect(toList());
+        List<Article> articles = jsonList.stream().filter(x -> x.getLong("timesort") > timeSort).map(jsonConvertService::convertToArticle).filter(Objects::nonNull).collect(toList());
         if (articles.size() > 0) {
             List<Integer> ids = articles.stream().map(Article::getArticleId).collect(toList());
             articleMapper.deleteByIDList(ids);
