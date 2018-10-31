@@ -9,11 +9,13 @@ import com.smzdm.util.HttpUtil;
 import com.smzdm.util.WxMsgConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Changdy on 2018/6/28.
@@ -27,8 +29,14 @@ public class SendNoticeService {
     private WxNoticeResultMapper wxNoticeResultMapper;
     @Autowired
     private ValueOperations<String, String> valueOperations;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     public void sendWxMsg(Integer articleId, SubNoticeMsg subNoticeMsg) {
+        if (stringRedisTemplate.hasKey("send:" + articleId)) {
+            return;
+        }
+        valueOperations.set("send:" + articleId, LocalDateTime.now().toString(), 3, TimeUnit.DAYS);
         WxNoticeTemplate wxNoticeTemplate = new WxNoticeTemplate();
         wxNoticeTemplate.url = projectConfig.getUrlPrefix() + articleId;
         wxNoticeTemplate.data = WxMsgConvertUtil.objectConvert(subNoticeMsg);
